@@ -1,0 +1,146 @@
+﻿<Window x:Class="WPF_filter.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WPF_filter"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="600" Width="1000" WindowStartupLocation="CenterScreen" MinHeight="600" MinWidth="1000">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"></RowDefinition>
+            <RowDefinition Height="2*"></RowDefinition>
+            <RowDefinition Height="1*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Row="0">
+            <Menu DockPanel.Dock="Top">
+                <MenuItem Header="Load Image" x:Name="menuLoadImage" Click="menuLoadImage_Click" ></MenuItem>
+                <MenuItem Header="Save Image" x:Name="menuSaveImage" Click="menuSaveImage_Click"></MenuItem>
+                <MenuItem Header="Reset Image" x:Name="menuResetImage" Click="menuResetImage_Click"></MenuItem>
+                <MenuItem Header="About"></MenuItem>
+            </Menu>
+        </DockPanel>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"></ColumnDefinition>
+                <ColumnDefinition Width="1*"></ColumnDefinition>
+
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <Image x:Name="ogiginalImage" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <!--<Image.Source>
+                        <BitmapImage DecodePixelWidth="200" DecodePixelHeight="32" UriSource="{Binding PathImage}" />
+                    </Image.Source>-->
+                </Image>
+            </Grid>
+            <Grid Grid.Column="1">
+                <Image x:Name="convertedImage" HorizontalAlignment="Center" VerticalAlignment="Center" Source="{Binding Path=convertedBitmpImage, Mode=TwoWay, NotifyOnSourceUpdated=True, NotifyOnTargetUpdated=True}">
+                    <!--<Image.Source>
+                        <BitmapImage DecodePixelWidth="200" DecodePixelHeight="32" UriSource="{Binding PathImage}" />
+                    </Image.Source>-->
+                </Image>
+            </Grid>
+        </Grid>
+        <Grid Grid.Row="2" x:Name="controlPanel">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"></ColumnDefinition>
+                <ColumnDefinition Width="1*"></ColumnDefinition>
+                <ColumnDefinition Width="2*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid.Resources >
+                <Style TargetType="Border" >
+                    <Setter Property="Margin" Value="5,5,5,5" />
+                </Style>
+            </Grid.Resources>
+            <Border BorderBrush="Silver" BorderThickness="1" CornerRadius="8,8,3,3">
+                <Grid Grid.Column="0" Background="Azure">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40px"></RowDefinition>
+                        <RowDefinition Height="1*"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" FontStyle="Italic">Function Filter</TextBlock>
+                    <UniformGrid Grid.Row="1" Rows="2" Columns="2" Margin="5 5 5 5">
+                        <Button x:Name="inversionButtom" Content="Inversion" Click="inversionButtom_Click" Margin="15"></Button>
+                        <Button x:Name="brightness_correctionButton" Content="Brightness correction" Click="brightness_correctionButton_Click" Margin="15"></Button>
+                        <Button x:Name="contrast_enhancementButton" Content="Contrast enhancement" Click="contrast_enhancementButton_Click" Margin="15"></Button>
+                        <Button x:Name="gamma_correctionButton" Content="Gamma correction" Click="gamma_correctionButton_Click" Margin="15"></Button>
+                    </UniformGrid>
+                </Grid>
+            </Border>
+            <Border Grid.Column="1" BorderBrush="Silver" BorderThickness="1" CornerRadius="8,8,3,3">
+                <Grid Background="Azure">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40px"></RowDefinition>
+                        <RowDefinition Height="1*"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" FontStyle="Italic">Convolution Filter</TextBlock>
+                    <UniformGrid Grid.Row="1" Rows="3" Columns="2" Margin="5 5 5 5">
+                        <Button x:Name="blurButtom" Content="Blur" Click="blurButtom_Click" Margin="5"></Button>
+                        <Button x:Name="gaussian_blurButton" Content="Gaussian blur" Click="gaussian_blurButton_Click" Margin="5"></Button>
+                        <Button x:Name="sharpenButton" Content="Sharpen" Click="sharpenButton_Click" Margin="5"></Button>
+                        <Button x:Name="edge_detectionButton" Content="Edge Detection" Click="edge_detectionButton_Click" Margin="5"></Button>
+                        <Button x:Name="embossButton" Content="Emboss" Click="embossButton_Click" Margin="5"></Button>
+                        <Button x:Name="pixelize" Content="Pixelize" Click="pixelize_Click" Margin="5"></Button>
+                    </UniformGrid>
+                </Grid>
+            </Border>
+            <Border Grid.Column="2"  BorderBrush="Silver" BorderThickness="1" CornerRadius="8,8,3,3">
+                <Grid Background="Azure">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40px"></RowDefinition>
+                        <RowDefinition Height="1*"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" FontStyle="Italic">Kernal for convolution filter</TextBlock>
+                    <Grid Grid.Row="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="50px"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0" Margin="5,5,5,5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="50"></ColumnDefinition>
+                                <ColumnDefinition Width="20"></ColumnDefinition>
+                                <ColumnDefinition Width="50"></ColumnDefinition>
+                                <ColumnDefinition Width="30"></ColumnDefinition>
+                                <ColumnDefinition Width="20"></ColumnDefinition>
+                                <ColumnDefinition Width="100"></ColumnDefinition>
+                                <ColumnDefinition Width="80"></ColumnDefinition>
+                                <ColumnDefinition Width="50"></ColumnDefinition>
+                                <ColumnDefinition Width="50"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Row="0" Grid.Column="0">Row</TextBlock>
+                            <TextBox x:Name="KernalRow" PreviewTextInput="KernalRow_PreviewTextInput" MaxLength="1" Grid.Row="0" Grid.Column="1">1</TextBox>
+                            <Button x:Name="KernalButton" Click="KernalButton_Click" Grid.Column="5" Grid.Row="0">Build kernal</Button>
+                            <TextBlock Grid.Row="1" Grid.Column="0">Columns</TextBlock>
+                            <TextBox x:Name="KernalColumns" PreviewTextInput="KernalColumns_PreviewTextInput" MaxLength="1" Grid.Row="1" Grid.Column="1">1</TextBox>
+                            <Button x:Name="Use" Click="Use_Click" Grid.Row="1" Grid.Column="5">Use</Button>
+                            <TextBlock Grid.Row="0" Grid.Column="2">Offset</TextBlock>
+                            <TextBox x:Name="KernalOffset" Grid.Row="0" Grid.Column="3" MaxLength="3" PreviewTextInput="KernalRCell_PreviewTextInput">0</TextBox>
+                            <CheckBox x:Name="checkBoxKernalOffset" Grid.Row="0" Grid.Column="4"  VerticalAlignment="Center"></CheckBox>
+                            <TextBlock Grid.Row="1" Grid.Column="2">Divisor</TextBlock>
+                            <TextBox x:Name="KernalDivisor" Grid.Row="1" Grid.Column="3" MaxLength="3" PreviewTextInput="KernalRCell_PreviewTextInput"></TextBox>
+                            <CheckBox x:Name="checkBoxKernalDivisor" Grid.Row="1" Grid.Column="4"  VerticalAlignment="Center"></CheckBox>
+                            <TextBlock Grid.Row="0" Grid.Column="6" HorizontalAlignment="Center">Anchor(x,y)</TextBlock>
+                            <TextBox x:Name="KernalAnchor" MaxLength="5" Grid.Row="0" Grid.Column="7">0,0</TextBox>
+                            <CheckBox x:Name="checkBoxKernalAnchor" Grid.Row="0" Grid.Column="8" HorizontalAlignment="Left"  VerticalAlignment="Center"></CheckBox>
+                            <ComboBox x:Name="comboBoxFilters" Grid.Row="1" Grid.Column="6">
+                                <ComboBoxItem IsSelected="True" x:Name="bjakblur" Content="Blur"/>
+                                <ComboBoxItem Content="Sharpen"/>
+                                <ComboBoxItem Content="Emboss"/>
+                                <ComboBoxItem Content="Gaussian"/>
+                                <ComboBoxItem Content="Edge detection"/>
+                            </ComboBox>
+                            <Button x:Name="loadFliter" Grid.Row="1" Grid.Column="7" Click="loadFliter_Click">Load</Button>
+                            <Button x:Name="saveFilter" Grid.Row="1" Grid.Column="8" Click="saveFilter_Click">Save</Button>
+                        </Grid>
+                        <Grid x:Name="kernalGrid" Grid.Row="1"></Grid>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
