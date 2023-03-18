@@ -1,29 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Ink;
 using System.Windows.Input;
-using System.Windows.Interop;
-using System.Windows.Markup;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 
 
@@ -70,21 +54,24 @@ namespace WPF_filter
             public const int brightness = 20;
             public const int contrast_limit_upper = 20;
             public const int contrast_limit_lower = 20;
-            public static int contrast_coefficient_a = (int)Math.Floor((double)(byte.MaxValue / (byte.MaxValue - contrast_limit_lower - contrast_limit_upper)));
+            public static int contrast_coefficient_a = (int)Math.Floor((double)(byte.MaxValue /
+                (byte.MaxValue - contrast_limit_lower - contrast_limit_upper)));
             public static int contrast_coefficient_b = -1 * contrast_limit_lower * contrast_coefficient_a;
             public const double gamma_corection = 1.7;
         }
-
-        public int[,] blurr = new int[3, 3];
-        public int[,] gaussian_smoothing = new int[3, 3];
-        public int gaussian_smoothing_s = 0;
-        public int[,] sharpen = new int[3, 3];
-        public static int sharpen_b = 5;
-        public static int sharpen_a = 1;
-        public int sharpen_s = sharpen_b - 4 * sharpen_a;
-        public int[,] edge_detection = new int[3, 3];
-        public int[,] emboss_filters = new int[3, 3];
-        public int emboss_filters_s = 1;
+        public class BasicConvolutionFilters
+        {
+            public static int[,] blurr = new int[3, 3];
+            public static int[,] gaussian_smoothing = new int[3, 3];
+            public static int gaussian_smoothing_s = 0;
+            public static int[,] sharpen = new int[3, 3];
+            public const int sharpen_b = 5;
+            public const int sharpen_a = 1;
+            public const int sharpen_s = sharpen_b - 4 * sharpen_a;
+            public static int[,] edge_detection = new int[3, 3];
+            public static int[,] emboss_filters = new int[3, 3];
+            public static int emboss_filters_s = 1;
+        }
 
 
         public int[,] edit_kernal;
@@ -172,30 +159,33 @@ namespace WPF_filter
             convertedBitmpImage = new BitmapImage();
             originalBitmpImage = new BitmapImage();
 
-            for (int i = 0; i < blurr.GetLength(0); i++)
+
+            for (int i = 0; i < BasicConvolutionFilters.blurr.GetLength(0); i++)
             {
-                for (int j = 0; j < blurr.GetLength(1); j++)
+                for (int j = 0; j < BasicConvolutionFilters.blurr.GetLength(1); j++)
                 {
-                    blurr[i, j] = 1;
+                    BasicConvolutionFilters.blurr[i, j] = 1;
                 }
             }
 
-            gaussian_smoothing = new int[3, 3] { { 0, 1, 0 }, { 1, 4, 1 }, { 0, 1, 0 } };
-            for (int i = 0; i < gaussian_smoothing.GetLength(0); i++)
+            BasicConvolutionFilters.gaussian_smoothing = new int[3, 3] { { 0, 1, 0 }, { 1, 4, 1 }, { 0, 1, 0 } };
+            for (int i = 0; i < BasicConvolutionFilters.gaussian_smoothing.GetLength(0); i++)
             {
-                for (int j = 0; j < gaussian_smoothing.GetLength(1); j++)
+                for (int j = 0; j < BasicConvolutionFilters.gaussian_smoothing.GetLength(1); j++)
                 {
-                    gaussian_smoothing_s += gaussian_smoothing[i, j];
+                    BasicConvolutionFilters.gaussian_smoothing_s += BasicConvolutionFilters.gaussian_smoothing[i, j];
                 }
             }
 
-            sharpen = new int[3, 3] { { 0, (int)(-1*sharpen_a/sharpen_s), 0 },
-                { (int)(-1 * sharpen_a / sharpen_s), (int)(sharpen_b/sharpen_s), (int)(-1*sharpen_a/sharpen_s)},
-                { 0, (int)(-1 * sharpen_a / sharpen_s), 0 } };
+            BasicConvolutionFilters.sharpen = new int[3, 3] { { 0, (int)(-1*BasicConvolutionFilters.sharpen_a/
+                    BasicConvolutionFilters.sharpen_s), 0 },
+                { (int)(-1 * BasicConvolutionFilters.sharpen_a / BasicConvolutionFilters.sharpen_s),
+                    (int)(BasicConvolutionFilters.sharpen_b/BasicConvolutionFilters.sharpen_s),
+                    (int)(-1*BasicConvolutionFilters.sharpen_a/BasicConvolutionFilters.sharpen_s)},
+                { 0, (int)(-1 * BasicConvolutionFilters.sharpen_a / BasicConvolutionFilters.sharpen_s), 0 } };
 
-            edge_detection = new int[3, 3] { { 0, -1, 0 }, { 0, 1, 0 }, { 0, 0, 0 } };
-
-            emboss_filters = new int[3, 3] { { -1, 0, 1 }, { -1, 1, 1 }, { -1, 0, 1 } };
+            BasicConvolutionFilters.edge_detection = new int[3, 3] { { 0, -1, 0 }, { 0, 1, 0 }, { 0, 0, 0 } };
+            BasicConvolutionFilters.emboss_filters = new int[3, 3] { { -1, 0, 1 }, { -1, 1, 1 }, { -1, 0, 1 } };
 
 
 
@@ -259,9 +249,9 @@ namespace WPF_filter
             {
                 pixels[i] = (byte)(byte.MaxValue - pixels[i]);
             }
-            var result = BitmapSource.Create(convertedBitmpImage.PixelWidth, convertedBitmpImage.PixelHeight, convertedBitmpImage.DpiX,
-                convertedBitmpImage.DpiY, convertedBitmpImage.Format,
-                null, pixels, (int)stride);
+            var result = BitmapSource.Create(convertedBitmpImage.PixelWidth, convertedBitmpImage.PixelHeight,
+                convertedBitmpImage.DpiX, convertedBitmpImage.DpiY, convertedBitmpImage.Format, null, pixels,
+                (int)stride);
 
             convertedBitmpImage = BitmapSourceToBitmapImage(result);
         }
@@ -272,14 +262,14 @@ namespace WPF_filter
             byte[] pixels = new byte[(int)(stride) * convertedBitmpImage.PixelHeight];
             convertedBitmpImage.CopyPixels(pixels, (int)stride, 0);
 
-            for (int i = 0; i < pixels.Length; i++)//
+            for (int i = 0; i < pixels.Length; i++)
             {
                 pixels[i] = (pixels[i] + Constans.brightness) <= (int)(byte.MaxValue)
                     ? (byte)(pixels[i] + Constans.brightness) : (byte)(byte.MaxValue);
             }
 
-            var result = BitmapSource.Create(convertedBitmpImage.PixelWidth, convertedBitmpImage.PixelHeight, convertedBitmpImage.DpiX,
-                convertedBitmpImage.DpiY, convertedBitmpImage.Format,
+            var result = BitmapSource.Create(convertedBitmpImage.PixelWidth, convertedBitmpImage.PixelHeight,
+                convertedBitmpImage.DpiX, convertedBitmpImage.DpiY, convertedBitmpImage.Format,
                 null, pixels, (int)stride);
 
             convertedBitmpImage = BitmapSourceToBitmapImage(result);
@@ -296,8 +286,8 @@ namespace WPF_filter
                 pixels[i] = (byte)(contrast_enhancment_color(pixels[i]));
             }
 
-            var result = BitmapSource.Create(convertedBitmpImage.PixelWidth, convertedBitmpImage.PixelHeight, convertedBitmpImage.DpiX,
-                convertedBitmpImage.DpiY, convertedBitmpImage.Format,
+            var result = BitmapSource.Create(convertedBitmpImage.PixelWidth, convertedBitmpImage.PixelHeight,
+                convertedBitmpImage.DpiX, convertedBitmpImage.DpiY, convertedBitmpImage.Format,
                 null, pixels, (int)stride);
 
             convertedBitmpImage = BitmapSourceToBitmapImage(result);
@@ -326,10 +316,12 @@ namespace WPF_filter
 
             for (int i = 0; i < pixels.Length; i++)
             {
-                pixels[i] = (byte)Math.Floor((255 * Math.Pow((double)pixels[i] / (double)byte.MaxValue, Constans.gamma_corection)));
+                pixels[i] = (byte)Math.Floor((255 * Math.Pow((double)pixels[i] / (double)byte.MaxValue,
+                    Constans.gamma_corection)));
             }
 
-            var result = BitmapSource.Create(convertedBitmpImage.PixelWidth, convertedBitmpImage.PixelHeight, convertedBitmpImage.DpiX,
+            var result = BitmapSource.Create(convertedBitmpImage.PixelWidth, convertedBitmpImage.PixelHeight,
+                convertedBitmpImage.DpiX,
                 convertedBitmpImage.DpiY, convertedBitmpImage.Format,
                 null, pixels, (int)stride);
 
@@ -338,420 +330,52 @@ namespace WPF_filter
 
         private void blurButtom_Click(object sender, RoutedEventArgs e)
         {
-            var stride = convertedBitmpImage.Width * Constans.pixel_size;
-            byte[] pixels = new byte[(int)(stride) * convertedBitmpImage.PixelHeight];
-            convertedBitmpImage.CopyPixels(pixels, (int)stride, 0);
-            //myRGBA[] myRGBAs_helper = new myRGBA[(int)((stride * convertedBitmpImage.PixelHeight)/4)];
-            myRGBA[] myRGBAs_helper = new myRGBA[(int)((pixels.Length) / 4)];
-            //myRGBA[,] myRGBAs = new myRGBA[convertedBitmpImage.PixelHeight, convertedBitmpImage.PixelWidth];
             myRGBA[,] myRGBAs = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
-
-            int j = 0;
-            for (int i = 0; i < pixels.Length; i = i + 4)
-            {
-                myRGBAs_helper[j] = new myRGBA(pixels[i], pixels[i + 1], pixels[i + 2], pixels[i + 3]);
-                j++;
-            }
-            for (int i = 0; i < convertedBitmpImage.PixelHeight; i++)
-            {
-                for (j = 0; j < (int)convertedBitmpImage.Width; j++)
-                {
-                    myRGBAs[i, j] = myRGBAs_helper[i * (int)convertedBitmpImage.Width + j];
-                }
-            }
-            myRGBA[,] myRGBAs1 = new myRGBA[convertedBitmpImage.PixelHeight + 2, (int)convertedBitmpImage.Width + 2];
+            imageToPixet2dArray(ref myRGBAs);
             myRGBA[,] result = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
-            myRGBA sum = new myRGBA(0, 0, 0, 0);
-            //var tmp = new myRGBA(0,0,0,0);
-            myRGBAs1 = makeArrayBorder(myRGBAs);
-            for (int i = 1; i < myRGBAs1.GetLength(0) - 1; i++)
-            {
-                for (j = 1; j < myRGBAs1.GetLength(1) - 1; j++)
-                {
-                    for (int k = 0; k < blurr.GetLength(0); k++)
-                    {
-                        for (int l = 0; l < blurr.GetLength(1); l++)
-                        {
-                            sum.A = sum.A + (blurr[k, l] * myRGBAs1[i - 1 + k, j - 1 + l].A);
-                            sum.B = sum.B + (blurr[k, l] * myRGBAs1[i - 1 + k, j - 1 + l].B);
-                            sum.R = sum.R + (blurr[k, l] * myRGBAs1[i - 1 + k, j - 1 + l].R);
-                            sum.G = sum.G + (blurr[k, l] * myRGBAs1[i - 1 + k, j - 1 + l].G);
-                        }
-                    }
-                    sum.B = sum.B / 9 < 255 ? sum.B / 9 : 255;
-                    sum.R = sum.R / 9 < 255 ? sum.R / 9 : 255;
-                    sum.G = sum.G / 9 < 255 ? sum.G / 9 : 255;
-                    sum.A = sum.A / 9 < 255 ? sum.A / 9 : 255;
-                    result[i - 1, j - 1] = new myRGBA(sum.R > 0 ? sum.R : 0, sum.G > 0 ? sum.G : 0, sum.B > 0 ? sum.B : 0, sum.A > 0 ? sum.A : 0);
-                    sum.A = 0;
-                    sum.B = 0;
-                    sum.R = 0;
-                    sum.G = 0;
-                }
-            }
-            int z = 0;
-            byte[] pixelsv2 = new byte[(int)(stride) * convertedBitmpImage.PixelHeight];
-            for (int i = 0; i < result.GetLength(0); i++)
-            {
-                for (j = 0; j < result.GetLength(1); j++)
-                {
-                    pixelsv2[z] = (byte)result[i, j].R;
-                    z++;
-                    pixelsv2[z] = (byte)result[i, j].G;
-                    z++;
-                    pixelsv2[z] = (byte)result[i, j].B;
-                    z++;
-                    pixelsv2[z] = (byte)result[i, j].A;
-                    z++;
-                }
-            }
-            var tmp = BitmapSource.Create(convertedBitmpImage.PixelWidth, convertedBitmpImage.PixelHeight, convertedBitmpImage.DpiX,
-                convertedBitmpImage.DpiY, convertedBitmpImage.Format,
-                null, pixelsv2, (int)stride);
-
-            convertedBitmpImage = BitmapSourceToBitmapImage(tmp);
-        }
-        private myRGBA[,] makeArrayBorder(myRGBA[,] myRGBAs)
-        {
-            myRGBA[,] result = new myRGBA[myRGBAs.GetLength(0) + 2, myRGBAs.GetLength(1) + 2];
-
-            for (int i = 0; i < myRGBAs.GetLength(0); i++)
-            {
-                for (int j = 0; j < myRGBAs.GetLength(1); j++)
-                {
-                    result[i + 1, j + 1] = myRGBAs[i, j];
-
-                }
-
-            }
-            //corners
-            result[0, 0] = result[1, 1];
-            result[result.GetLength(0) - 1, result.GetLength(1) - 1] = result[result.GetLength(0) - 2, result.GetLength(1) - 2];
-            result[0, result.GetLength(1) - 1] = result[1, result.GetLength(1) - 2];
-            result[result.GetLength(0) - 1, 0] = result[result.GetLength(0) - 2, 1];
-            //left
-            for (int i = 1; i < result.GetLength(0) - 1; i++)
-            {
-                result[i, 0] = result[i, 1];
-            }
-            //bottom
-            for (int i = 1; i < result.GetLength(1) - 1; i++)
-            {
-                result[result.GetLength(0) - 1, i] = result[result.GetLength(0) - 2, i];
-            }
-            //right
-            for (int i = 1; i < result.GetLength(0) - 1; i++)
-            {
-                result[i, result.GetLength(1) - 1] = result[i, result.GetLength(1) - 2];
-            }
-            //top
-            for (int i = 1; i < result.GetLength(1) - 1; i++)
-            {
-                result[0, i] = result[1, i];
-            }
-
-            return result;
+            applyFilter(myRGBAs, 1, 1, 9, 0, BasicConvolutionFilters.blurr, ref result);
         }
 
         private void gaussian_blurButton_Click(object sender, RoutedEventArgs e)
         {
-            var stride = convertedBitmpImage.Width * Constans.pixel_size;
-            byte[] pixels = new byte[(int)(stride) * convertedBitmpImage.PixelHeight];
-            convertedBitmpImage.CopyPixels(pixels, (int)stride, 0);
-            myRGBA[] myRGBAs_helper = new myRGBA[(int)((pixels.Length) / 4)];
             myRGBA[,] myRGBAs = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
-
-            int j = 0;
-            for (int i = 0; i < pixels.Length; i = i + 4)
-            {
-                myRGBAs_helper[j] = new myRGBA(pixels[i], pixels[i + 1], pixels[i + 2], pixels[i + 3]);
-                j++;
-            }
-            for (int i = 0; i < convertedBitmpImage.PixelHeight; i++)
-            {
-                for (j = 0; j < (int)convertedBitmpImage.Width; j++)
-                {
-                    myRGBAs[i, j] = myRGBAs_helper[i * (int)convertedBitmpImage.Width + j];
-                }
-            }
-            myRGBA[,] myRGBAs1 = new myRGBA[convertedBitmpImage.PixelHeight + 2, (int)convertedBitmpImage.Width + 2];
+            imageToPixet2dArray(ref myRGBAs);
             myRGBA[,] result = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
-            myRGBA sum = new myRGBA(0, 0, 0, 0);
-            //var tmp = new myRGBA(0,0,0,0);
-            myRGBAs1 = makeArrayBorder(myRGBAs);
-            for (int i = 1; i < myRGBAs1.GetLength(0) - 1; i++)
-            {
-                for (j = 1; j < myRGBAs1.GetLength(1) - 1; j++)
-                {
-                    for (int k = 0; k < gaussian_smoothing.GetLength(0); k++)
-                    {
-                        for (int l = 0; l < gaussian_smoothing.GetLength(1); l++)
-                        {
-                            sum.A = sum.A + (gaussian_smoothing[k, l] * myRGBAs1[i - 1 + k, j - 1 + l].A);
-                            sum.B = sum.B + (gaussian_smoothing[k, l] * myRGBAs1[i - 1 + k, j - 1 + l].B);
-                            sum.R = sum.R + (gaussian_smoothing[k, l] * myRGBAs1[i - 1 + k, j - 1 + l].R);
-                            sum.G = sum.G + (gaussian_smoothing[k, l] * myRGBAs1[i - 1 + k, j - 1 + l].G);
-                        }
-                    }
-                    sum.B = sum.B / gaussian_smoothing_s < 255 ? sum.B / gaussian_smoothing_s : 255;
-                    sum.R = sum.R / gaussian_smoothing_s < 255 ? sum.R / gaussian_smoothing_s : 255;
-                    sum.G = sum.G / gaussian_smoothing_s < 255 ? sum.G / gaussian_smoothing_s : 255;
-                    sum.A = sum.A / gaussian_smoothing_s < 255 ? sum.A / gaussian_smoothing_s : 255;
-                    result[i - 1, j - 1] = new myRGBA(sum.R > 0 ? sum.R : 0, sum.G > 0 ? sum.G : 0, sum.B > 0 ? sum.B : 0, sum.A > 0 ? sum.A : 0);
-                    sum.A = 0;
-                    sum.B = 0;
-                    sum.R = 0;
-                    sum.G = 0;
-                }
-            }
-            int z = 0;
-            byte[] pixelsv2 = new byte[(int)(stride) * convertedBitmpImage.PixelHeight];
-            for (int i = 0; i < result.GetLength(0); i++)
-            {
-                for (j = 0; j < result.GetLength(1); j++)
-                {
-                    pixelsv2[z] = (byte)result[i, j].R;
-                    z++;
-                    pixelsv2[z] = (byte)result[i, j].G;
-                    z++;
-                    pixelsv2[z] = (byte)result[i, j].B;
-                    z++;
-                    pixelsv2[z] = (byte)result[i, j].A;
-                    z++;
-                }
-            }
+            applyFilter(myRGBAs, 1, 1, BasicConvolutionFilters.gaussian_smoothing_s, 0,
+                BasicConvolutionFilters.gaussian_smoothing, ref result);
 
-            var tmp = BitmapSource.Create(convertedBitmpImage.PixelWidth, convertedBitmpImage.PixelHeight, convertedBitmpImage.DpiX,
-                convertedBitmpImage.DpiY, convertedBitmpImage.Format,
-                null, pixelsv2, (int)stride);
-
-            convertedBitmpImage = BitmapSourceToBitmapImage(tmp);
         }
 
         private void sharpenButton_Click(object sender, RoutedEventArgs e)
         {
-            var stride = convertedBitmpImage.Width * Constans.pixel_size;
-            byte[] pixels = new byte[(int)(stride) * convertedBitmpImage.PixelHeight];
-            convertedBitmpImage.CopyPixels(pixels, (int)stride, 0);
-            myRGBA[] myRGBAs_helper = new myRGBA[(int)((pixels.Length) / 4)];
             myRGBA[,] myRGBAs = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
-
-            int j = 0;
-            for (int i = 0; i < pixels.Length; i = i + 4)
-            {
-                myRGBAs_helper[j] = new myRGBA(pixels[i], pixels[i + 1], pixels[i + 2], pixels[i + 3]);
-                j++;
-            }
-            for (int i = 0; i < convertedBitmpImage.PixelHeight; i++)
-            {
-                for (j = 0; j < (int)convertedBitmpImage.Width; j++)
-                {
-                    myRGBAs[i, j] = myRGBAs_helper[i * (int)convertedBitmpImage.Width + j];
-                }
-            }
-            myRGBA[,] myRGBAs1 = new myRGBA[convertedBitmpImage.PixelHeight + 2, (int)convertedBitmpImage.Width + 2];
+            imageToPixet2dArray(ref myRGBAs);
             myRGBA[,] result = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
-            myRGBA sum = new myRGBA(0, 0, 0, 0);
-            //var tmp = new myRGBA(0,0,0,0);
-            myRGBAs1 = makeArrayBorder(myRGBAs);
-            for (int i = 1; i < myRGBAs1.GetLength(0) - 1; i++)
-            {
-                for (j = 1; j < myRGBAs1.GetLength(1) - 1; j++)
-                {
-                    for (int k = 0; k < sharpen.GetLength(0); k++)
-                    {
-                        for (int l = 0; l < sharpen.GetLength(1); l++)
-                        {
-                            sum.A = sum.A + (sharpen[k, l] * myRGBAs1[i - 1 + k, j - 1 + l].A);
-                            sum.B = sum.B + (sharpen[k, l] * myRGBAs1[i - 1 + k, j - 1 + l].B);
-                            sum.R = sum.R + (sharpen[k, l] * myRGBAs1[i - 1 + k, j - 1 + l].R);
-                            sum.G = sum.G + (sharpen[k, l] * myRGBAs1[i - 1 + k, j - 1 + l].G);
-                        }
-                    }
-                    sum.B = sum.B / sharpen_s < 255 ? sum.B / sharpen_s : 255;
-                    sum.R = sum.R / sharpen_s < 255 ? sum.R / sharpen_s : 255;
-                    sum.G = sum.G / sharpen_s < 255 ? sum.G / sharpen_s : 255;
-                    sum.A = sum.A / sharpen_s < 255 ? sum.A / sharpen_s : 255;
-
-                    result[i - 1, j - 1] = new myRGBA(sum.R > 0 ? sum.R : 0, sum.G > 0 ? sum.G : 0, sum.B > 0 ? sum.B : 0, sum.A > 0 ? sum.A : 0);
-                    sum.A = 0;
-                    sum.B = 0;
-                    sum.R = 0;
-                    sum.G = 0;
-                }
-            }
-            int z = 0;
-            byte[] pixelsv2 = new byte[(int)(stride) * convertedBitmpImage.PixelHeight];
-            for (int i = 0; i < result.GetLength(0); i++)
-            {
-                for (j = 0; j < result.GetLength(1); j++)
-                {
-                    pixelsv2[z] = (byte)result[i, j].R;
-                    z++;
-                    pixelsv2[z] = (byte)result[i, j].G;
-                    z++;
-                    pixelsv2[z] = (byte)result[i, j].B;
-                    z++;
-                    pixelsv2[z] = (byte)result[i, j].A;
-                    z++;
-                }
-            }
-            var tmp = BitmapSource.Create(convertedBitmpImage.PixelWidth, convertedBitmpImage.PixelHeight, convertedBitmpImage.DpiX,
-                convertedBitmpImage.DpiY, convertedBitmpImage.Format,
-                null, pixelsv2, (int)stride);
-
-            convertedBitmpImage = BitmapSourceToBitmapImage(tmp);
+            applyFilter(myRGBAs,1,1,BasicConvolutionFilters.sharpen_s,0,
+                BasicConvolutionFilters.sharpen,ref result);
         }
 
         private void edge_detectionButton_Click(object sender, RoutedEventArgs e)
         {
             var stride = convertedBitmpImage.Width * Constans.pixel_size;
-            byte[] pixels = new byte[(int)(stride) * convertedBitmpImage.PixelHeight];
-            convertedBitmpImage.CopyPixels(pixels, (int)stride, 0);
-            myRGBA[] myRGBAs_helper = new myRGBA[(int)((pixels.Length) / 4)];
             myRGBA[,] myRGBAs = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+            imageToPixet2dArray(ref myRGBAs);
 
-            int j = 0;
-            for (int i = 0; i < pixels.Length; i = i + 4)
-            {
-                myRGBAs_helper[j] = new myRGBA(pixels[i], pixels[i + 1], pixels[i + 2], pixels[i + 3]);
-                j++;
-            }
-            for (int i = 0; i < convertedBitmpImage.PixelHeight; i++)
-            {
-                for (j = 0; j < (int)convertedBitmpImage.Width; j++)
-                {
-                    myRGBAs[i, j] = myRGBAs_helper[i * (int)convertedBitmpImage.Width + j];
-                }
-            }
-            myRGBA[,] myRGBAs1 = new myRGBA[convertedBitmpImage.PixelHeight + 2, (int)convertedBitmpImage.Width + 2];
             myRGBA[,] result = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
-            myRGBA sum = new myRGBA(0, 0, 0, 0);
-            //var tmp = new myRGBA(0,0,0,0);
-            myRGBAs1 = makeArrayBorder(myRGBAs);
-            for (int i = 1; i < myRGBAs1.GetLength(0) - 1; i++)
-            {
-                for (j = 1; j < myRGBAs1.GetLength(1) - 1; j++)
-                {
-                    for (int k = 0; k < edge_detection.GetLength(0); k++)
-                    {
-                        for (int l = 0; l < edge_detection.GetLength(1); l++)
-                        {
-                            sum.A = sum.A + (edge_detection[k, l] * myRGBAs1[i - 1 + k, j - 1 + l].A);
-                            sum.B = sum.B + (edge_detection[k, l] * myRGBAs1[i - 1 + k, j - 1 + l].B);
-                            sum.R = sum.R + (edge_detection[k, l] * myRGBAs1[i - 1 + k, j - 1 + l].R);
-                            sum.G = sum.G + (edge_detection[k, l] * myRGBAs1[i - 1 + k, j - 1 + l].G);
-                        }
-                    }
-                    sum.B = sum.B / 1 < 255 ? sum.B / 1 : 255;
-                    sum.R = sum.R / 1 < 255 ? sum.R / 1 : 255;
-                    sum.G = sum.G / 1 < 255 ? sum.G / 1 : 255;
-                    sum.A = sum.A / 1 < 255 ? sum.A / 1 : 255;
+            applyFilter(myRGBAs, 1, 1, 1, 0, BasicConvolutionFilters.edge_detection, ref result);
 
-                    result[i - 1, j - 1] = new myRGBA(sum.R > 0 ? sum.R : 0, sum.G > 0 ? sum.G : 0, sum.B > 0 ? sum.B : 0, sum.A > 0 ? sum.A : 0);
-                    sum.A = 0;
-                    sum.B = 0;
-                    sum.R = 0;
-                    sum.G = 0;
-                }
-            }
-            int z = 0;
-            byte[] pixelsv2 = new byte[(int)(stride) * convertedBitmpImage.PixelHeight];
-            for (int i = 0; i < result.GetLength(0); i++)
-            {
-                for (j = 0; j < result.GetLength(1); j++)
-                {
-                    pixelsv2[z] = (byte)result[i, j].R;
-                    z++;
-                    pixelsv2[z] = (byte)result[i, j].G;
-                    z++;
-                    pixelsv2[z] = (byte)result[i, j].B;
-                    z++;
-                    pixelsv2[z] = (byte)result[i, j].A;
-                    z++;
-                }
-            }
-            var tmp = BitmapSource.Create(convertedBitmpImage.PixelWidth, convertedBitmpImage.PixelHeight, convertedBitmpImage.DpiX,
-                convertedBitmpImage.DpiY, convertedBitmpImage.Format,
-                null, pixelsv2, (int)stride);
-
-            convertedBitmpImage = BitmapSourceToBitmapImage(tmp);
         }
 
         private void embossButton_Click(object sender, RoutedEventArgs e)
         {
             var stride = convertedBitmpImage.Width * Constans.pixel_size;
-            byte[] pixels = new byte[(int)(stride) * convertedBitmpImage.PixelHeight];
-            convertedBitmpImage.CopyPixels(pixels, (int)stride, 0);
-            //myRGBA[] myRGBAs_helper = new myRGBA[(int)((stride * convertedBitmpImage.PixelHeight)/4)];
-            myRGBA[] myRGBAs_helper = new myRGBA[(int)((pixels.Length) / 4)];
-            //myRGBA[,] myRGBAs = new myRGBA[convertedBitmpImage.PixelHeight, convertedBitmpImage.PixelWidth];
             myRGBA[,] myRGBAs = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+            imageToPixet2dArray(ref myRGBAs);
 
-            int j = 0;
-            for (int i = 0; i < pixels.Length; i = i + 4)
-            {
-                myRGBAs_helper[j] = new myRGBA(pixels[i], pixels[i + 1], pixels[i + 2], pixels[i + 3]);
-                j++;
-            }
-            for (int i = 0; i < convertedBitmpImage.PixelHeight; i++)
-            {
-                for (j = 0; j < (int)convertedBitmpImage.Width; j++)
-                {
-                    myRGBAs[i, j] = myRGBAs_helper[i * (int)convertedBitmpImage.Width + j];
-                }
-            }
-            myRGBA[,] myRGBAs1 = new myRGBA[convertedBitmpImage.PixelHeight + 2, (int)convertedBitmpImage.Width + 2];
             myRGBA[,] result = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
-            myRGBA sum = new myRGBA(0, 0, 0, 0);
-            //var tmp = new myRGBA(0,0,0,0);
-            myRGBAs1 = makeArrayBorder(myRGBAs);
-            for (int i = 1; i < myRGBAs1.GetLength(0) - 1; i++)
-            {
-                for (j = 1; j < myRGBAs1.GetLength(1) - 1; j++)
-                {
-                    for (int k = 0; k < emboss_filters.GetLength(0); k++)
-                    {
-                        for (int l = 0; l < emboss_filters.GetLength(1); l++)
-                        {
-                            sum.A = sum.A + (emboss_filters[k, l] * myRGBAs1[i - 1 + k, j - 1 + l].A);
-                            sum.B = sum.B + (emboss_filters[k, l] * myRGBAs1[i - 1 + k, j - 1 + l].B);
-                            sum.R = sum.R + (emboss_filters[k, l] * myRGBAs1[i - 1 + k, j - 1 + l].R);
-                            sum.G = sum.G + (emboss_filters[k, l] * myRGBAs1[i - 1 + k, j - 1 + l].G);
-                        }
-                    }
-                    sum.B = sum.B / emboss_filters_s < 255 ? sum.B / emboss_filters_s : 255;
-                    sum.R = sum.R / emboss_filters_s < 255 ? sum.R / emboss_filters_s : 255;
-                    sum.G = sum.G / emboss_filters_s < 255 ? sum.G / emboss_filters_s : 255;
-                    sum.A = sum.A / emboss_filters_s < 255 ? sum.A / emboss_filters_s : 255;
-                    result[i - 1, j - 1] = new myRGBA(sum.R > 0 ? sum.R : 0, sum.G > 0 ? sum.G : 0, sum.B > 0 ? sum.B : 0, sum.A > 0 ? sum.A : 0);
-                    sum.A = 0;
-                    sum.B = 0;
-                    sum.R = 0;
-                    sum.G = 0;
-                }
-            }
-            int z = 0;
-            byte[] pixelsv2 = new byte[(int)(stride) * convertedBitmpImage.PixelHeight];
-            for (int i = 0; i < result.GetLength(0); i++)
-            {
-                for (j = 0; j < result.GetLength(1); j++)
-                {
-                    pixelsv2[z] = (byte)result[i, j].R;
-                    z++;
-                    pixelsv2[z] = (byte)result[i, j].G;
-                    z++;
-                    pixelsv2[z] = (byte)result[i, j].B;
-                    z++;
-                    pixelsv2[z] = (byte)result[i, j].A;
-                    z++;
-                }
-            }
-            var tmp = BitmapSource.Create(convertedBitmpImage.PixelWidth, convertedBitmpImage.PixelHeight, convertedBitmpImage.DpiX,
-                convertedBitmpImage.DpiY, convertedBitmpImage.Format,
-                null, pixelsv2, (int)stride);
+            applyFilter(myRGBAs, 1, 1, BasicConvolutionFilters.emboss_filters_s, 0,
+                BasicConvolutionFilters.emboss_filters,ref result);
 
-            convertedBitmpImage = BitmapSourceToBitmapImage(tmp);
         }
 
         private void KernalRow_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -795,9 +419,7 @@ namespace WPF_filter
             var stride = convertedBitmpImage.Width * Constans.pixel_size;
             byte[] pixels = new byte[(int)(stride) * convertedBitmpImage.PixelHeight];
             convertedBitmpImage.CopyPixels(pixels, (int)stride, 0);
-            //myRGBA[] myRGBAs_helper = new myRGBA[(int)((stride * convertedBitmpImage.PixelHeight)/4)];
             myRGBA[] myRGBAs_helper = new myRGBA[(int)((pixels.Length) / 4)];
-            //myRGBA[,] myRGBAs = new myRGBA[convertedBitmpImage.PixelHeight, convertedBitmpImage.PixelWidth];
             myRGBA[,] myRGBAs = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
 
             int j = 0;
@@ -859,7 +481,6 @@ namespace WPF_filter
             int z = 0;
             b += 16;
             byte[] pixelsv2 = new byte[(int)a * 4 * b * 4];
-            // byte[] pixelsv2 = new byte[a * a];
 
             for (int i = 0; i < a; i++)
             {
@@ -923,14 +544,12 @@ namespace WPF_filter
         }
         private void Use_Click(object sender, RoutedEventArgs e)
         {
-
             int v = 0;
             var textboxes = this.kernalGrid.Children.OfType<TextBox>().ToArray();
             for (int i = 0; i < (char)KernalRow.Text[0] - '0'; i++)
             {
                 for (int c = 0; c < (char)KernalColumns.Text[0] - '0'; c++)
                 {
-                    //edit_kernal[i, c] = textboxes[v].Text[0] - '0';
                     edit_kernal[i, c] = Int32.Parse(textboxes[v].Text);
 
                     v++;
@@ -958,32 +577,11 @@ namespace WPF_filter
             else
                 offset = Int32.Parse(KernalOffset.Text);
 
-
-            var stride = convertedBitmpImage.Width * Constans.pixel_size;
-            byte[] pixels = new byte[(int)(stride) * convertedBitmpImage.PixelHeight];
-            convertedBitmpImage.CopyPixels(pixels, (int)stride, 0);
-            myRGBA[] myRGBAs_helper = new myRGBA[(int)((pixels.Length) / 4)];
             myRGBA[,] myRGBAs = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+            imageToPixet2dArray(ref myRGBAs);
 
-
-            for (int i = 0, h = 0; i < pixels.Length; i = i + 4, h++)
-            {
-                myRGBAs_helper[h] = new myRGBA(pixels[i], pixels[i + 1], pixels[i + 2], pixels[i + 3]);
-
-            }
-            for (int i = 0; i < convertedBitmpImage.PixelHeight; i++)
-            {
-                for (int j = 0; j < (int)convertedBitmpImage.Width; j++)
-                {
-                    myRGBAs[i, j] = myRGBAs_helper[i * (int)convertedBitmpImage.Width + j];
-                }
-            }
-
-            myRGBA[,] result = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
-
-            int anchory = (int)Int32.Parse(this.KernalColumns.Text) / 2;
-            int anchorx = (int)Int32.Parse(this.KernalRow.Text) / 2;
-
+            int anchory = Int32.Parse(this.KernalColumns.Text) / 2;
+            int anchorx = Int32.Parse(this.KernalRow.Text) / 2;
             if (checkBoxKernalAnchor.IsChecked == true)
             {
                 string[] strings = this.KernalAnchor.Text.Split(',');
@@ -991,36 +589,43 @@ namespace WPF_filter
                 anchory = Int32.Parse(strings[0]);
             }
 
-            for (int x = 0; x < myRGBAs.GetLength(0); x++)
+            myRGBA[,] result = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+            applyFilter(myRGBAs, anchorx, anchory, edit_kernal_s, offset,edit_kernal, ref result);
+
+        }
+
+        private void applyFilter(myRGBA[,] initialImage,int anchorx, int anchory,int divisor, int offset,int[,] kernal, ref myRGBA[,] result)
+        {
+            var stride = convertedBitmpImage.Width * Constans.pixel_size;
+            for (int x = 0; x < initialImage.GetLength(0); x++)
             {
-                for (int y = 0; y < myRGBAs.GetLength(1); y++)
+                for (int y = 0; y < initialImage.GetLength(1); y++)
                 {
                     myRGBA sum = new myRGBA(0, 0, 0, 0);
 
-                    for (int i = 0; i < Int32.Parse(this.KernalRow.Text); ++i)
+                    for (int i = 0; i < kernal.GetLength(0); ++i)
                     {
-                        for (int j = 0; j < Int32.Parse(this.KernalColumns.Text); ++j)
+                        for (int j = 0; j < kernal.GetLength(1); ++j)
                         {
 
                             int xp = x + i - anchorx, yp = y + j - anchory;
 
-                            move_point_to_border(ref xp, ref yp, myRGBAs.GetLength(0), myRGBAs.GetLength(1));
-                            sum.A = sum.A + (edit_kernal[i, j] * myRGBAs[xp, yp].A);
-                            sum.B = sum.B + (edit_kernal[i, j] * myRGBAs[xp, yp].B);
-                            sum.R = sum.R + (edit_kernal[i, j] * myRGBAs[xp, yp].R);
-                            sum.G = sum.G + (edit_kernal[i, j] * myRGBAs[xp, yp].G);
+                            move_point_to_border(ref xp, ref yp, initialImage.GetLength(0), initialImage.GetLength(1));
+                            sum.A = sum.A + (kernal[i, j] * initialImage[xp, yp].A);
+                            sum.B = sum.B + (kernal[i, j] * initialImage[xp, yp].B);
+                            sum.R = sum.R + (kernal[i, j] * initialImage[xp, yp].R);
+                            sum.G = sum.G + (kernal[i, j] * initialImage[xp, yp].G);
                         }
                     }
 
-                    sum.B = (sum.B / edit_kernal_s) + offset < 255 ? sum.B / edit_kernal_s + offset : 255;
-                    sum.R = (sum.R / edit_kernal_s) + offset < 255 ? sum.R / edit_kernal_s + offset : 255;
-                    sum.G = (sum.G / edit_kernal_s) + offset < 255 ? sum.G / edit_kernal_s + offset : 255;
-                    sum.A = (sum.A / edit_kernal_s) + offset < 255 ? sum.A / edit_kernal_s + offset : 255;
+                    sum.B = (sum.B / divisor) + offset < 255 ? sum.B / divisor + offset : 255;
+                    sum.R = (sum.R / divisor) + offset < 255 ? sum.R / divisor + offset : 255;
+                    sum.G = (sum.G / divisor) + offset < 255 ? sum.G / divisor + offset : 255;
+                    sum.A = (sum.A / divisor) + offset < 255 ? sum.A / divisor + offset : 255;
                     result[x, y] = new myRGBA(sum.R > 0 ? sum.R : 0, sum.G > 0 ? sum.G : 0, sum.B > 0 ? sum.B : 0, sum.A > 0 ? sum.A : 0);
 
                 }
             }
-
             int z = 0;
             byte[] pixelsv2 = new byte[(int)(stride) * convertedBitmpImage.PixelHeight];
             for (int i = 0; i < result.GetLength(0); i++)
@@ -1044,6 +649,27 @@ namespace WPF_filter
             convertedBitmpImage = BitmapSourceToBitmapImage(tmp);
         }
 
+        private void imageToPixet2dArray(ref myRGBA[,] array2d)
+        {
+            var stride = convertedBitmpImage.Width * Constans.pixel_size;
+            byte[] pixels = new byte[(int)(stride) * convertedBitmpImage.PixelHeight];
+            convertedBitmpImage.CopyPixels(pixels, (int)stride, 0);
+            myRGBA[] myRGBAs_helper = new myRGBA[(int)((pixels.Length) / 4)];
+            
+            for (int i = 0, h = 0; i < pixels.Length; i = i + 4, h++)
+            {
+                myRGBAs_helper[h] = new myRGBA(pixels[i], pixels[i + 1], pixels[i + 2], pixels[i + 3]);
+
+            }
+            for (int i = 0; i < convertedBitmpImage.PixelHeight; i++)
+            {
+                for (int j = 0; j < (int)convertedBitmpImage.Width; j++)
+                {
+                    array2d[i, j] = myRGBAs_helper[i * (int)convertedBitmpImage.Width + j];
+                }
+            }
+        }
+        
         private void loadFliter_Click(object sender, RoutedEventArgs e)
         {
 
@@ -1059,7 +685,7 @@ namespace WPF_filter
                 {
                     for (int j = 0; j < 3; j++)
                     {
-                        textboxes[v].Text = blurr[i, j].ToString();
+                        textboxes[v].Text = BasicConvolutionFilters.blurr[i, j].ToString();
                         v++;
                     }
                 }
@@ -1081,14 +707,14 @@ namespace WPF_filter
                 {
                     for (int j = 0; j < 3; j++)
                     {
-                        textboxes[v].Text = sharpen[i, j].ToString();
+                        textboxes[v].Text = BasicConvolutionFilters.sharpen[i, j].ToString();
                         v++;
                     }
                 }
 
                 checkBoxKernalAnchor.IsChecked = false;
                 checkBoxKernalDivisor.IsChecked = true;
-                KernalDivisor.Text = sharpen_s.ToString();
+                KernalDivisor.Text = BasicConvolutionFilters.sharpen_s.ToString();
                 checkBoxKernalOffset.IsChecked = false;
             }
             // Emboss
@@ -1103,14 +729,14 @@ namespace WPF_filter
                 {
                     for (int j = 0; j < 3; j++)
                     {
-                        textboxes[v].Text = emboss_filters[i, j].ToString();
+                        textboxes[v].Text = BasicConvolutionFilters.emboss_filters[i, j].ToString();
                         v++;
                     }
                 }
 
                 checkBoxKernalAnchor.IsChecked = false;
                 checkBoxKernalDivisor.IsChecked = true;
-                KernalDivisor.Text = emboss_filters_s.ToString();
+                KernalDivisor.Text = BasicConvolutionFilters.emboss_filters_s.ToString();
                 checkBoxKernalOffset.IsChecked = false;
             }
             //Gaussian
@@ -1125,14 +751,14 @@ namespace WPF_filter
                 {
                     for (int j = 0; j < 3; j++)
                     {
-                        textboxes[v].Text = gaussian_smoothing[i, j].ToString();
+                        textboxes[v].Text = BasicConvolutionFilters.gaussian_smoothing[i, j].ToString();
                         v++;
                     }
                 }
 
                 checkBoxKernalAnchor.IsChecked = false;
                 checkBoxKernalDivisor.IsChecked = true;
-                KernalDivisor.Text = gaussian_smoothing_s.ToString();
+                KernalDivisor.Text = BasicConvolutionFilters.gaussian_smoothing_s.ToString();
                 checkBoxKernalOffset.IsChecked = false;
             }
             // Edge detection
@@ -1147,7 +773,7 @@ namespace WPF_filter
                 {
                     for (int j = 0; j < 3; j++)
                     {
-                        textboxes[v].Text = edge_detection[i, j].ToString();
+                        textboxes[v].Text = BasicConvolutionFilters.edge_detection[i, j].ToString();
                         v++;
                     }
                 }
@@ -1170,7 +796,7 @@ namespace WPF_filter
                         int v = 0;
                         for (int i = 0; i < Int32.Parse(customFiltersArray[l - 5].rowN); i++)
                         {
-                            for (int j = 0; j <Int32.Parse(customFiltersArray[l - 5].colN); j++)
+                            for (int j = 0; j < Int32.Parse(customFiltersArray[l - 5].colN); j++)
                             {
                                 textboxes[v].Text = customFiltersArray[l - 5].matrix[i, j].ToString();
                                 v++;
@@ -1202,7 +828,8 @@ namespace WPF_filter
                     v++;
                 }
             }
-            customFiltersArray[counter] = new customFilter(KernalRow.Text, KernalColumns.Text, matrix, (bool)checkBoxKernalAnchor.IsChecked, KernalAnchor.Text, (bool)checkBoxKernalDivisor.IsChecked,
+            customFiltersArray[counter] = new customFilter(KernalRow.Text, KernalColumns.Text, matrix,
+                (bool)checkBoxKernalAnchor.IsChecked, KernalAnchor.Text, (bool)checkBoxKernalDivisor.IsChecked,
                 KernalDivisor.Text, (bool)checkBoxKernalOffset.IsChecked, KernalOffset.Text);
 
             ComboBoxItem tmp = new ComboBoxItem();
