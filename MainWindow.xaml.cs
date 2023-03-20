@@ -97,19 +97,19 @@ namespace WPF_filter
                 _originalBitmpImage = value;
             }
         }
-        public class myRGBA
+        public class myRGB
         {
             public int R;
             public int G;
             public int B;
-            public int A;
 
-            public myRGBA(int r, int g, int b, int a)
+
+            public myRGB(int r, int g, int b)
             {
                 R = r;
                 G = g;
                 B = b;
-                A = a;
+
             }
         }
 
@@ -330,50 +330,50 @@ namespace WPF_filter
 
         private void blurButtom_Click(object sender, RoutedEventArgs e)
         {
-            myRGBA[,] myRGBAs = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
-            imageToPixet2dArray(ref myRGBAs);
-            myRGBA[,] result = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
-            applyFilter(myRGBAs, 1, 1, 9, 0, BasicConvolutionFilters.blurr, ref result);
+            myRGB[,] myRGBs = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+            imageToPixet2dArray(ref myRGBs);
+            myRGB[,] result = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+            applyFilter(myRGBs, 1, 1, 9, 0, BasicConvolutionFilters.blurr, ref result);
         }
 
         private void gaussian_blurButton_Click(object sender, RoutedEventArgs e)
         {
-            myRGBA[,] myRGBAs = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
-            imageToPixet2dArray(ref myRGBAs);
-            myRGBA[,] result = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
-            applyFilter(myRGBAs, 1, 1, BasicConvolutionFilters.gaussian_smoothing_s, 0,
+            myRGB[,] myRGBs = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+            imageToPixet2dArray(ref myRGBs);
+            myRGB[,] result = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+            applyFilter(myRGBs, 1, 1, BasicConvolutionFilters.gaussian_smoothing_s, 0,
                 BasicConvolutionFilters.gaussian_smoothing, ref result);
 
         }
 
         private void sharpenButton_Click(object sender, RoutedEventArgs e)
         {
-            myRGBA[,] myRGBAs = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
-            imageToPixet2dArray(ref myRGBAs);
-            myRGBA[,] result = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
-            applyFilter(myRGBAs,1,1,BasicConvolutionFilters.sharpen_s,0,
+            myRGB[,] myRGBs = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+            imageToPixet2dArray(ref myRGBs);
+            myRGB[,] result = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+            applyFilter(myRGBs,1,1,BasicConvolutionFilters.sharpen_s,0,
                 BasicConvolutionFilters.sharpen,ref result);
         }
 
         private void edge_detectionButton_Click(object sender, RoutedEventArgs e)
         {
             var stride = convertedBitmpImage.Width * Constans.pixel_size;
-            myRGBA[,] myRGBAs = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
-            imageToPixet2dArray(ref myRGBAs);
+            myRGB[,] myRGBs = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+            imageToPixet2dArray(ref myRGBs);
 
-            myRGBA[,] result = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
-            applyFilter(myRGBAs, 1, 1, 1, 0, BasicConvolutionFilters.edge_detection, ref result);
+            myRGB[,] result = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+            applyFilter(myRGBs, 1, 1, 1, 0, BasicConvolutionFilters.edge_detection, ref result);
 
         }
 
         private void embossButton_Click(object sender, RoutedEventArgs e)
         {
             var stride = convertedBitmpImage.Width * Constans.pixel_size;
-            myRGBA[,] myRGBAs = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
-            imageToPixet2dArray(ref myRGBAs);
+            myRGB[,] myRGBs = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+            imageToPixet2dArray(ref myRGBs);
 
-            myRGBA[,] result = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
-            applyFilter(myRGBAs, 1, 1, BasicConvolutionFilters.emboss_filters_s, 0,
+            myRGB[,] result = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+            applyFilter(myRGBs, 1, 1, BasicConvolutionFilters.emboss_filters_s, 0,
                 BasicConvolutionFilters.emboss_filters,ref result);
 
         }
@@ -419,56 +419,56 @@ namespace WPF_filter
             var stride = convertedBitmpImage.Width * Constans.pixel_size;
             byte[] pixels = new byte[(int)(stride) * convertedBitmpImage.PixelHeight];
             convertedBitmpImage.CopyPixels(pixels, (int)stride, 0);
-            myRGBA[] myRGBAs_helper = new myRGBA[(int)((pixels.Length) / 4)];
-            myRGBA[,] myRGBAs = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+            myRGB[] myRGBs_helper = new myRGB[(int)((pixels.Length) / 4)];
+            myRGB[,] myRGBs = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
 
             int j = 0;
             for (int i = 0; i < pixels.Length; i = i + 4)
             {
-                myRGBAs_helper[j] = new myRGBA(pixels[i], pixels[i + 1], pixels[i + 2], pixels[i + 3]);
+                myRGBs_helper[j] = new myRGB(pixels[i], pixels[i + 1], pixels[i + 2]);
                 j++;
             }
             for (int i = 0; i < convertedBitmpImage.PixelHeight; i++)
             {
                 for (j = 0; j < (int)convertedBitmpImage.Width; j++)
                 {
-                    myRGBAs[i, j] = myRGBAs_helper[i * (int)convertedBitmpImage.Width + j];
+                    myRGBs[i, j] = myRGBs_helper[i * (int)convertedBitmpImage.Width + j];
                 }
             }
-            myRGBA[,] myRGBAs1 = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
-            myRGBA[,] result = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
-            myRGBA sum = new myRGBA(0, 0, 0, 0);
+            myRGB[,] myRGBs1 = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+            myRGB[,] result = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+            myRGB sum = new myRGB(0, 0, 0);
             int a = 0;
             int b = 0;
-            for (int i = 0; i < myRGBAs.GetLength(0) - 16; i += 16)
+            for (int i = 0; i < myRGBs.GetLength(0) - 16; i += 16)
             {
                 a += 16;
-                for (j = 0; j < myRGBAs.GetLength(1) - 16; j += 16)
+                for (j = 0; j < myRGBs.GetLength(1) - 16; j += 16)
                 {
 
                     for (int k = 0; k < 16; k++)
                     {
                         for (int l = 0; l < 16; l++)
                         {
-                            sum.A = sum.A + (myRGBAs[i + k, j + l].A);
-                            sum.B = sum.B + (myRGBAs[i + k, j + l].B);
-                            sum.R = sum.R + (myRGBAs[i + k, j + l].R);
-                            sum.G = sum.G + (myRGBAs[i + k, j + l].G);
+
+                            sum.B = sum.B + (myRGBs[i + k, j + l].B);
+                            sum.R = sum.R + (myRGBs[i + k, j + l].R);
+                            sum.G = sum.G + (myRGBs[i + k, j + l].G);
                         }
                     }
 
                     sum.B = sum.B / 256 < 255 ? sum.B / 256 : 255;
                     sum.R = sum.R / 256 < 255 ? sum.R / 256 : 255;
                     sum.G = sum.G / 256 < 255 ? sum.G / 256 : 255;
-                    sum.A = sum.A / 256 < 255 ? sum.A / 256 : 255;
+                    
                     for (int k = 0; k < 16; k++)
                     {
                         for (int l = 0; l < 16; l++)
                         {
-                            result[i + k, j + l] = new myRGBA(sum.R > 0 ? sum.R : 0, sum.G > 0 ? sum.G : 0, sum.B > 0 ? sum.B : 0, sum.A > 0 ? sum.A : 0);
+                            result[i + k, j + l] = new myRGB(sum.R > 0 ? sum.R : 0, sum.G > 0 ? sum.G : 0, sum.B > 0 ? sum.B : 0);
                         }
                     }
-                    sum.A = 0;
+
                     sum.B = 0;
                     sum.R = 0;
                     sum.G = 0;
@@ -492,7 +492,7 @@ namespace WPF_filter
                     z++;
                     pixelsv2[z] = (byte)result[i, j].B;
                     z++;
-                    pixelsv2[z] = (byte)result[i, j].A;
+
                     z++;
                 }
             }
@@ -577,8 +577,8 @@ namespace WPF_filter
             else
                 offset = Int32.Parse(KernalOffset.Text);
 
-            myRGBA[,] myRGBAs = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
-            imageToPixet2dArray(ref myRGBAs);
+            myRGB[,] myRGBs = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+            imageToPixet2dArray(ref myRGBs);
 
             int anchory = Int32.Parse(this.KernalColumns.Text) / 2;
             int anchorx = Int32.Parse(this.KernalRow.Text) / 2;
@@ -589,19 +589,19 @@ namespace WPF_filter
                 anchory = Int32.Parse(strings[0]);
             }
 
-            myRGBA[,] result = new myRGBA[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
-            applyFilter(myRGBAs, anchorx, anchory, edit_kernal_s, offset,edit_kernal, ref result);
+            myRGB[,] result = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+            applyFilter(myRGBs, anchorx, anchory, edit_kernal_s, offset,edit_kernal, ref result);
 
         }
 
-        private void applyFilter(myRGBA[,] initialImage,int anchorx, int anchory,int divisor, int offset,int[,] kernal, ref myRGBA[,] result)
+        private void applyFilter(myRGB[,] initialImage,int anchorx, int anchory,int divisor, int offset,int[,] kernal, ref myRGB[,] result)
         {
             var stride = convertedBitmpImage.Width * Constans.pixel_size;
             for (int x = 0; x < initialImage.GetLength(0); x++)
             {
                 for (int y = 0; y < initialImage.GetLength(1); y++)
                 {
-                    myRGBA sum = new myRGBA(0, 0, 0, 0);
+                    myRGB sum = new myRGB(0, 0, 0);
 
                     for (int i = 0; i < kernal.GetLength(0); ++i)
                     {
@@ -611,7 +611,7 @@ namespace WPF_filter
                             int xp = x + i - anchorx, yp = y + j - anchory;
 
                             move_point_to_border(ref xp, ref yp, initialImage.GetLength(0), initialImage.GetLength(1));
-                            sum.A = sum.A + (kernal[i, j] * initialImage[xp, yp].A);
+
                             sum.B = sum.B + (kernal[i, j] * initialImage[xp, yp].B);
                             sum.R = sum.R + (kernal[i, j] * initialImage[xp, yp].R);
                             sum.G = sum.G + (kernal[i, j] * initialImage[xp, yp].G);
@@ -621,8 +621,8 @@ namespace WPF_filter
                     sum.B = (sum.B / divisor) + offset < 255 ? sum.B / divisor + offset : 255;
                     sum.R = (sum.R / divisor) + offset < 255 ? sum.R / divisor + offset : 255;
                     sum.G = (sum.G / divisor) + offset < 255 ? sum.G / divisor + offset : 255;
-                    sum.A = (sum.A / divisor) + offset < 255 ? sum.A / divisor + offset : 255;
-                    result[x, y] = new myRGBA(sum.R > 0 ? sum.R : 0, sum.G > 0 ? sum.G : 0, sum.B > 0 ? sum.B : 0, sum.A > 0 ? sum.A : 0);
+
+                    result[x, y] = new myRGB(sum.R > 0 ? sum.R : 0, sum.G > 0 ? sum.G : 0, sum.B > 0 ? sum.B : 0);
 
                 }
             }
@@ -638,7 +638,7 @@ namespace WPF_filter
                     z++;
                     pixelsv2[z] = (byte)result[i, j].B;
                     z++;
-                    pixelsv2[z] = (byte)result[i, j].A;
+
                     z++;
                 }
             }
@@ -649,23 +649,23 @@ namespace WPF_filter
             convertedBitmpImage = BitmapSourceToBitmapImage(tmp);
         }
 
-        private void imageToPixet2dArray(ref myRGBA[,] array2d)
+        private void imageToPixet2dArray(ref myRGB[,] array2d)
         {
             var stride = convertedBitmpImage.Width * Constans.pixel_size;
             byte[] pixels = new byte[(int)(stride) * convertedBitmpImage.PixelHeight];
             convertedBitmpImage.CopyPixels(pixels, (int)stride, 0);
-            myRGBA[] myRGBAs_helper = new myRGBA[(int)((pixels.Length) / 4)];
+            myRGB[] myRGBs_helper = new myRGB[(int)((pixels.Length) / 4)];
             
             for (int i = 0, h = 0; i < pixels.Length; i = i + 4, h++)
             {
-                myRGBAs_helper[h] = new myRGBA(pixels[i], pixels[i + 1], pixels[i + 2], pixels[i + 3]);
+                myRGBs_helper[h] = new myRGB(pixels[i], pixels[i + 1], pixels[i + 2]);
 
             }
             for (int i = 0; i < convertedBitmpImage.PixelHeight; i++)
             {
                 for (int j = 0; j < (int)convertedBitmpImage.Width; j++)
                 {
-                    array2d[i, j] = myRGBAs_helper[i * (int)convertedBitmpImage.Width + j];
+                    array2d[i, j] = myRGBs_helper[i * (int)convertedBitmpImage.Width + j];
                 }
             }
         }
