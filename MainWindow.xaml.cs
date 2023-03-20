@@ -407,11 +407,31 @@ namespace WPF_filter
         }
         private void KernalRCell_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            Regex regex = new Regex("[+-]?\b[0-9]+\b");
-            if (regex.IsMatch(e.Text[0].ToString()))
+            //Regex regex = new Regex("[+-]?\b[0-9]+\b");
+            string pattern = @"-?\d+$"; 
+            if (Regex.IsMatch(e.Text, pattern))
+            {
+                e.Handled = false;
+                //return;
+            }
+            else
             {
                 e.Handled = true;
-                return;
+                
+            }
+        }
+        private void grayScale_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            //Regex regex = new Regex("[+-]?\b[0-9]+\b");
+            string pattern = @"^[1-9]\d*$";
+            if (Regex.IsMatch(e.Text, pattern))
+            {
+                e.Handled = false;
+            }
+            else
+            {
+                e.Handled = true;
+
             }
         }
         private void pixelize_Click(object sender, RoutedEventArgs e)
@@ -878,6 +898,11 @@ namespace WPF_filter
                 null, pixelsv2, (int)stride);
 
             convertedBitmpImage = BitmapSourceToBitmapImage(tmp);
+        }
+
+        private void averageDitheringButton_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 

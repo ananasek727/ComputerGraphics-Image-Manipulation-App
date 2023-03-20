@@ -6,6 +6,21 @@
         xmlns:local="clr-namespace:WPF_filter"
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="1000" WindowStartupLocation="CenterScreen" MinHeight="600" MinWidth="1000">
+    <Window.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="FontFamily" Value="Comic Sans MS"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="MaxWidth" Value="150"></Setter>
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="5" />
+                </Style>
+            </Style.Resources>
+        </Style>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="20"></RowDefinition>
@@ -27,18 +42,10 @@
 
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
-                <Image x:Name="ogiginalImage" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <!--<Image.Source>
-                        <BitmapImage DecodePixelWidth="200" DecodePixelHeight="32" UriSource="{Binding PathImage}" />
-                    </Image.Source>-->
-                </Image>
+                <Image x:Name="ogiginalImage" HorizontalAlignment="Center" VerticalAlignment="Center"></Image>
             </Grid>
             <Grid Grid.Column="1">
-                <Image x:Name="convertedImage" HorizontalAlignment="Center" VerticalAlignment="Center" Source="{Binding Path=convertedBitmpImage, Mode=TwoWay, NotifyOnSourceUpdated=True, NotifyOnTargetUpdated=True}">
-                    <!--<Image.Source>
-                        <BitmapImage DecodePixelWidth="200" DecodePixelHeight="32" UriSource="{Binding PathImage}" />
-                    </Image.Source>-->
-                </Image>
+                <Image x:Name="convertedImage" HorizontalAlignment="Center" VerticalAlignment="Center" Source="{Binding Path=convertedBitmpImage, Mode=TwoWay, NotifyOnSourceUpdated=True, NotifyOnTargetUpdated=True}"></Image>
             </Grid>
         </Grid>
         <Grid Grid.Row="2" x:Name="controlPanel">
@@ -86,61 +93,138 @@
                 </Grid>
             </Border>
             <Border Grid.Column="2"  BorderBrush="Silver" BorderThickness="1" CornerRadius="8,8,3,3">
-                <Grid Background="Azure">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="40px"></RowDefinition>
-                        <RowDefinition Height="1*"></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" FontStyle="Italic">Kernal for convolution filter</TextBlock>
-                    <Grid Grid.Row="1">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="50px"></RowDefinition>
-                            <RowDefinition Height="*"></RowDefinition>
-                        </Grid.RowDefinitions>
-                        <Grid Grid.Row="0" Margin="5,5,5,5">
+                <TabControl>
+                    <TabControl.Resources>
+                        <Style TargetType="TabItem">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="TabItem">
+                                        <Border Name="Border" BorderThickness="1,1,1,0" BorderBrush="Gainsboro" CornerRadius="4,4,0,0" Margin="2,0">
+                                            <ContentPresenter x:Name="ContentSite"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        ContentSource="Header"
+                                        Margin="10,2"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="Border" Property="Background" Value="LightGray" />
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="False">
+                                                <Setter TargetName="Border" Property="Background" Value="GhostWhite" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </TabControl.Resources>
+                    <TabItem Header="Convolution Filter" IsSelected="True">
+                        <Grid Background="Azure">
                             <Grid.RowDefinitions>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
+                                <RowDefinition Height="40px"></RowDefinition>
+                                <RowDefinition Height="1*"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" FontStyle="Italic">Kernal for convolution filter</TextBlock>
+                            <Grid Grid.Row="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="50px"></RowDefinition>
+                                    <RowDefinition Height="*"></RowDefinition>
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="0" Margin="5,5,5,5">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="50*"></ColumnDefinition>
+                                        <ColumnDefinition Width="20*"></ColumnDefinition>
+                                        <ColumnDefinition Width="50*"></ColumnDefinition>
+                                        <ColumnDefinition Width="30*"></ColumnDefinition>
+                                        <ColumnDefinition Width="20*"></ColumnDefinition>
+                                        <ColumnDefinition Width="100*"></ColumnDefinition>
+                                        <ColumnDefinition Width="80*"></ColumnDefinition>
+                                        <ColumnDefinition Width="50*"></ColumnDefinition>
+                                        <ColumnDefinition Width="50*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0">Row</TextBlock>
+                                    <TextBox x:Name="KernalRow" PreviewTextInput="KernalRow_PreviewTextInput" MaxLength="1" Grid.Row="0" Grid.Column="1">1</TextBox>
+                                    <Button x:Name="KernalButton" Click="KernalButton_Click" Grid.Column="5" Grid.Row="0">Build kernal</Button>
+                                    <TextBlock Grid.Row="1" Grid.Column="0">Columns</TextBlock>
+                                    <TextBox x:Name="KernalColumns" PreviewTextInput="KernalColumns_PreviewTextInput" MaxLength="1" Grid.Row="1" Grid.Column="1">1</TextBox>
+                                    <Button x:Name="Use" Click="Use_Click" Grid.Row="1" Grid.Column="5">Use</Button>
+                                    <TextBlock Grid.Row="0" Grid.Column="2">Offset</TextBlock>
+                                    <TextBox x:Name="KernalOffset" Grid.Row="0" Grid.Column="3" MaxLength="3" PreviewTextInput="KernalRCell_PreviewTextInput">0</TextBox>
+                                    <CheckBox x:Name="checkBoxKernalOffset" Grid.Row="0" Grid.Column="4"  VerticalAlignment="Center"></CheckBox>
+                                    <TextBlock Grid.Row="1" Grid.Column="2">Divisor</TextBlock>
+                                    <TextBox x:Name="KernalDivisor" Grid.Row="1" Grid.Column="3" MaxLength="3" PreviewTextInput="KernalRCell_PreviewTextInput"></TextBox>
+                                    <CheckBox x:Name="checkBoxKernalDivisor" Grid.Row="1" Grid.Column="4"  VerticalAlignment="Center"></CheckBox>
+                                    <TextBlock Grid.Row="0" Grid.Column="6" HorizontalAlignment="Center">Anchor(x,y)</TextBlock>
+                                    <TextBox x:Name="KernalAnchor" MaxLength="5" Grid.Row="0" Grid.Column="7">0,0</TextBox>
+                                    <CheckBox x:Name="checkBoxKernalAnchor" Grid.Row="0" Grid.Column="8" HorizontalAlignment="Left"  VerticalAlignment="Center"></CheckBox>
+                                    <ComboBox x:Name="comboBoxFilters" Grid.Row="1" Grid.Column="6">
+                                        <ComboBoxItem IsSelected="True" x:Name="bjakblur" Content="Blur"/>
+                                        <ComboBoxItem Content="Sharpen"/>
+                                        <ComboBoxItem Content="Emboss"/>
+                                        <ComboBoxItem Content="Gaussian"/>
+                                        <ComboBoxItem Content="Edge detection"/>
+                                    </ComboBox>
+                                    <Button x:Name="loadFliter" Grid.Row="1" Grid.Column="7" Click="loadFliter_Click">Load</Button>
+                                    <Button x:Name="saveFilter" Grid.Row="1" Grid.Column="8" Click="saveFilter_Click">Save</Button>
+                                </Grid>
+                                <Grid x:Name="kernalGrid" Grid.Row="1"></Grid>
+                            </Grid>
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="Dithering algorithms">
+                        <Grid Background="Azure">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="50px"></RowDefinition>
+                                <RowDefinition Height="*"></RowDefinition>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="50"></ColumnDefinition>
-                                <ColumnDefinition Width="20"></ColumnDefinition>
-                                <ColumnDefinition Width="50"></ColumnDefinition>
-                                <ColumnDefinition Width="30"></ColumnDefinition>
-                                <ColumnDefinition Width="20"></ColumnDefinition>
-                                <ColumnDefinition Width="100"></ColumnDefinition>
-                                <ColumnDefinition Width="80"></ColumnDefinition>
-                                <ColumnDefinition Width="50"></ColumnDefinition>
-                                <ColumnDefinition Width="50"></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Row="0" Grid.Column="0">Row</TextBlock>
-                            <TextBox x:Name="KernalRow" PreviewTextInput="KernalRow_PreviewTextInput" MaxLength="1" Grid.Row="0" Grid.Column="1">1</TextBox>
-                            <Button x:Name="KernalButton" Click="KernalButton_Click" Grid.Column="5" Grid.Row="0">Build kernal</Button>
-                            <TextBlock Grid.Row="1" Grid.Column="0">Columns</TextBlock>
-                            <TextBox x:Name="KernalColumns" PreviewTextInput="KernalColumns_PreviewTextInput" MaxLength="1" Grid.Row="1" Grid.Column="1">1</TextBox>
-                            <Button x:Name="Use" Click="Use_Click" Grid.Row="1" Grid.Column="5">Use</Button>
-                            <TextBlock Grid.Row="0" Grid.Column="2">Offset</TextBlock>
-                            <TextBox x:Name="KernalOffset" Grid.Row="0" Grid.Column="3" MaxLength="3" PreviewTextInput="KernalRCell_PreviewTextInput">0</TextBox>
-                            <CheckBox x:Name="checkBoxKernalOffset" Grid.Row="0" Grid.Column="4"  VerticalAlignment="Center"></CheckBox>
-                            <TextBlock Grid.Row="1" Grid.Column="2">Divisor</TextBlock>
-                            <TextBox x:Name="KernalDivisor" Grid.Row="1" Grid.Column="3" MaxLength="3" PreviewTextInput="KernalRCell_PreviewTextInput"></TextBox>
-                            <CheckBox x:Name="checkBoxKernalDivisor" Grid.Row="1" Grid.Column="4"  VerticalAlignment="Center"></CheckBox>
-                            <TextBlock Grid.Row="0" Grid.Column="6" HorizontalAlignment="Center">Anchor(x,y)</TextBlock>
-                            <TextBox x:Name="KernalAnchor" MaxLength="5" Grid.Row="0" Grid.Column="7">0,0</TextBox>
-                            <CheckBox x:Name="checkBoxKernalAnchor" Grid.Row="0" Grid.Column="8" HorizontalAlignment="Left"  VerticalAlignment="Center"></CheckBox>
-                            <ComboBox x:Name="comboBoxFilters" Grid.Row="1" Grid.Column="6">
-                                <ComboBoxItem IsSelected="True" x:Name="bjakblur" Content="Blur"/>
-                                <ComboBoxItem Content="Sharpen"/>
-                                <ComboBoxItem Content="Emboss"/>
-                                <ComboBoxItem Content="Gaussian"/>
-                                <ComboBoxItem Content="Edge detection"/>
-                            </ComboBox>
-                            <Button x:Name="loadFliter" Grid.Row="1" Grid.Column="7" Click="loadFliter_Click">Load</Button>
-                            <Button x:Name="saveFilter" Grid.Row="1" Grid.Column="8" Click="saveFilter_Click">Save</Button>
+                            <TextBlock Grid.Row="0"  Grid.ColumnSpan="2"  HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" FontStyle="Italic">Dithering algorithms</TextBlock>
+
+
+
+                            <Button x:Name="averageDitheringButton" Grid.Column="0" Grid.Row="1" Height="30" Width="110" Click="averageDitheringButton_Click">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Background" Value="Azure" />
+                                        <Style.Triggers>
+                                            <EventTrigger RoutedEvent="Loaded">
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)" To="Orange" Duration="0:0:2"
+                                                                        AutoReverse="True"
+                                                                        RepeatBehavior="Forever">
+                                                        </ColorAnimation>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                Average dithering
+                            </Button>
+                            <UniformGrid Grid.Row="1" Grid.Column="1" Rows="2" Columns="1">
+                                <TextBlock>Numer of grey cannals:</TextBlock>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 0 10 0 ">K =</TextBlock>
+                                    <TextBox x:Name="numberOfColourTextBox" Grid.Column="1" Height="20" Width="50" HorizontalAlignment="Left" VerticalAlignment="Top" PreviewTextInput="KernalRCell_PreviewTextInput"/>
+                                </Grid>
+                            </UniformGrid>
+                            
                         </Grid>
-                        <Grid x:Name="kernalGrid" Grid.Row="1"></Grid>
-                    </Grid>
-                </Grid>
+                    </TabItem>
+                </TabControl>
             </Border>
         </Grid>
     </Grid>
