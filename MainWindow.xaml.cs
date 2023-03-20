@@ -638,7 +638,7 @@ namespace WPF_filter
                     z++;
                     pixelsv2[z] = (byte)result[i, j].B;
                     z++;
-
+                    pixelsv2[z] = (byte)255;
                     z++;
                 }
             }
@@ -836,6 +836,48 @@ namespace WPF_filter
             tmp.Content = counter.ToString() + " Your filter";
             counter++;
             comboBoxFilters.Items.Add(tmp);
+        }
+
+        private void grayscaleButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.gamma_correctionButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            myRGB[,] myRGBs = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+            imageToPixet2dArray(ref myRGBs);
+            var stride = convertedBitmpImage.Width * Constans.pixel_size;
+            myRGB[,] result = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+
+            for (int i = 0; i < myRGBs.GetLength(0); i++)
+            {
+                for (int j = 0; j < myRGBs.GetLength(1); j++)
+                {
+                    int brightness = (int)(0.2126 * myRGBs[i, j].R + 0.7152 * myRGBs[i, j].G + 0.0722 * myRGBs[i,j].B);
+
+                    
+                    result[i, j] = new myRGB(brightness > 0 ? brightness : 0, brightness > 0 ? brightness : 0, brightness > 0 ? brightness : 0);
+
+                }
+            }
+            int z = 0;
+            byte[] pixelsv2 = new byte[(int)(stride) * convertedBitmpImage.PixelHeight];
+            for (int i = 0; i < result.GetLength(0); i++)
+            {
+                for (int j = 0; j < result.GetLength(1); j++)
+                {
+                    pixelsv2[z] = (byte)result[i, j].R;
+                    z++;
+                    pixelsv2[z] = (byte)result[i, j].G;
+                    z++;
+                    pixelsv2[z] = (byte)result[i, j].B;
+                    z++;
+                    pixelsv2[z] = (byte)255;
+                    z++;
+                }
+            }
+            var tmp = BitmapSource.Create(convertedBitmpImage.PixelWidth, convertedBitmpImage.PixelHeight, convertedBitmpImage.DpiX,
+                convertedBitmpImage.DpiY, convertedBitmpImage.Format,
+                null, pixelsv2, (int)stride);
+
+            convertedBitmpImage = BitmapSourceToBitmapImage(tmp);
         }
     }
 

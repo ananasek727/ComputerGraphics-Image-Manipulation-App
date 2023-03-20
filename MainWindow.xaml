@@ -59,11 +59,12 @@
                         <RowDefinition Height="1*"></RowDefinition>
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" FontStyle="Italic">Function Filter</TextBlock>
-                    <UniformGrid Grid.Row="1" Rows="2" Columns="2" Margin="5 5 5 5">
-                        <Button x:Name="inversionButtom" Content="Inversion" Click="inversionButtom_Click" Margin="15"></Button>
-                        <Button x:Name="brightness_correctionButton" Content="Brightness correction" Click="brightness_correctionButton_Click" Margin="15"></Button>
-                        <Button x:Name="contrast_enhancementButton" Content="Contrast enhancement" Click="contrast_enhancementButton_Click" Margin="15"></Button>
-                        <Button x:Name="gamma_correctionButton" Content="Gamma correction" Click="gamma_correctionButton_Click" Margin="15"></Button>
+                    <UniformGrid Grid.Row="1" Rows="3" Columns="2" Margin="5 5 5 5">
+                        <Button x:Name="inversionButtom" Content="Inversion" Click="inversionButtom_Click" Margin="5"></Button>
+                        <Button x:Name="brightness_correctionButton" Content="Brightness correction" Click="brightness_correctionButton_Click" Margin="5"></Button>
+                        <Button x:Name="contrast_enhancementButton" Content="Contrast enhancement" Click="contrast_enhancementButton_Click" Margin="5"></Button>
+                        <Button x:Name="gamma_correctionButton" Content="Gamma correction" Click="gamma_correctionButton_Click" Margin="5"></Button>
+                        <Button x:Name="grayscaleButton" Content="Gray scale" Click="grayscaleButton_Click" Margin="5"></Button>
                     </UniformGrid>
                 </Grid>
             </Border>
