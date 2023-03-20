@@ -186,7 +186,7 @@ namespace WPF_filter
 
             BasicConvolutionFilters.edge_detection = new int[3, 3] { { 0, -1, 0 }, { 0, 1, 0 }, { 0, 0, 0 } };
             BasicConvolutionFilters.emboss_filters = new int[3, 3] { { -1, 0, 1 }, { -1, 1, 1 }, { -1, 0, 1 } };
-
+            controlPanel.IsEnabled = false;
 
 
         }
@@ -209,7 +209,7 @@ namespace WPF_filter
                 ogiginalImage.Source = originalBitmpImage;
 
                 convertedBitmpImage = BitmapImageToBitmapImage(bitmap);
-                //convertedImage.Source = convertedBitmpImage;
+                controlPanel.IsEnabled = true;
             }
         }
 
