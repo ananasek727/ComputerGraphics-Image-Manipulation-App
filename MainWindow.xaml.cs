@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Ink;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 
@@ -899,11 +901,106 @@ namespace WPF_filter
 
             convertedBitmpImage = BitmapSourceToBitmapImage(tmp);
         }
+        private float get_mean(int left, int right,ref int[] array)
+        {
+            float mean = 0;
 
+            for(int i = left,n=0; i <= right; i++)
+            {
+                int prev = n;
+                n += array[i];
+                mean += ((float)i/Math.Max(1,prev))*(float)array[i];
+                mean /= Math.Max(1,n);
+                mean *= Math.Max(1,prev);
+            }
+            return mean;
+        }
+        private void threshold(int left,int right, int n, ref List<int> thresholds ,ref int[] array)
+        {
+            if (n == 1)
+            {
+                return;
+            }
+            float mean = get_mean(left, right,ref array);
+            int limit = (int)Math.Round(mean);
+            thresholds.Add(limit);
+            threshold(left, limit, n / 2, ref thresholds, ref array);
+            threshold(Math.Min(limit+1,255),right,n/2, ref thresholds, ref array);
+        }
+        
         private void averageDitheringButton_Click(object sender, RoutedEventArgs e)
         {
+            if(Int32.Parse(numberOfColourTextBox.Text)>255)
+            {
+                var massage = MessageBox.Show("Too much for mee!!!");
+                return;
+            }            
+            if (!((Int32.Parse(numberOfColourTextBox.Text)!=0)&&((Int32.Parse(numberOfColourTextBox.Text) &
+                (Int32.Parse(numberOfColourTextBox.Text) - 1)) == 0)))
+            {
+                var massage = MessageBox.Show("Don't you know powers of two!!!");
+                return;
+            }
 
+            myRGB[,] myRGBs = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+            imageToPixet2dArray(ref myRGBs);
+            int[] array = new int[256];
+            for(int i=0; i < 256; i++)
+            {
+                array[i] = 0;
+            }
+            for(int i = 0; i < myRGBs.GetLength(0); i++)
+            {
+                for(int j=0; j<myRGBs.GetLength(1); j++)
+                {
+                    array[myRGBs[i,j].B]++;
+                }
+            }
+            List<int> list = new List<int>();
+            threshold(0, 255, Int32.Parse(numberOfColourTextBox.Text),ref list,ref array);            
+            list.Sort();
+            list.Add(255);            
+            myRGB[,] result = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+            for(int i = 0; i < result.GetLength(0); i++)
+            {
+                for(int j=0; j<result.GetLength(1); j++)
+                {
+                    for(int k=0; k < list.Count; k++)
+                    {
+                        if (myRGBs[i, j].B <= list[k])
+                        {
+                            var tmp = new myRGB((int)(255 / (list.Count + 1) * k), (int)(255 / (list.Count + 1) * k),
+                                (int)(255 / (list.Count + 1) * k));
+                            result[i, j] = tmp;
+                            break;
+                        }
+                    }
+                }
+            }
+            int z = 0;
+            var stride = convertedBitmpImage.Width * Constans.pixel_size;
+            byte[] pixelsv2 = new byte[(int)(stride) * convertedBitmpImage.PixelHeight];
+            for (int i = 0; i < result.GetLength(0); i++)
+            {
+                for (int j = 0; j < result.GetLength(1); j++)
+                {
+                    pixelsv2[z] = (byte)result[i, j].R;
+                    z++;
+                    pixelsv2[z] = (byte)result[i, j].G;
+                    z++;
+                    pixelsv2[z] = (byte)result[i, j].B;
+                    z++;
+                    pixelsv2[z] = (byte)255;
+                    z++;
+                }
+            }
+            var rez = BitmapSource.Create(convertedBitmpImage.PixelWidth, convertedBitmpImage.PixelHeight, convertedBitmpImage.DpiX,
+                convertedBitmpImage.DpiY, convertedBitmpImage.Format,
+                null, pixelsv2, (int)stride);
+
+            convertedBitmpImage = BitmapSourceToBitmapImage(rez);
         }
+
     }
 
 }
