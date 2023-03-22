@@ -190,12 +190,12 @@
                             <Button x:Name="averageDitheringButton" Grid.Column="0" Grid.Row="1" Height="30" Width="110" Click="averageDitheringButton_Click">
                                 <Button.Style>
                                     <Style TargetType="Button">
-                                        <Setter Property="Background" Value="Azure" />
+                                        <Setter Property="Background" Value="White" />
                                         <Style.Triggers>
                                             <EventTrigger RoutedEvent="Loaded">
                                                 <BeginStoryboard>
                                                     <Storyboard>
-                                                        <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)" To="Orange" Duration="0:0:2"
+                                                        <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)" To="Blue" Duration="0:0:2"
                                                                         AutoReverse="True"
                                                                         RepeatBehavior="Forever">
                                                         </ColorAnimation>
@@ -207,17 +207,34 @@
                                 </Button.Style>
                                 Average dithering
                             </Button>
-                            <UniformGrid Grid.Row="1" Grid.Column="1" Rows="2" Columns="1">
-                                <TextBlock>Numer of grey cannals:</TextBlock>
-                                <Grid>
+                            <Grid Grid.Row="1" Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="3*"></ColumnDefinition>
+                                    <ColumnDefinition Width="13*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Margin="18,0,18.5,23" Grid.RowSpan="2" Width="203">Numer of colours per channels:</TextBlock>
+                                <TextBlock Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0.5,10,0" Height="19" Width="20">R =</TextBlock>
+                                <TextBox x:Name="numberOfColour_R_TextBox" Grid.Row="1" Grid.Column="1" Height="20" Width="50" HorizontalAlignment="Left" VerticalAlignment="Center" PreviewTextInput="KernalRCell_PreviewTextInput" Margin="0,1.5,0,2">1</TextBox>
+                                <TextBlock Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 0 10 0 " Height="19" Width="21">G =</TextBlock>
+                                <Grid Grid.Row="2" Grid.Column="1" Margin="0,0,-0.5,0">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition></ColumnDefinition>
-                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition Width="53*"></ColumnDefinition>
+                                        <ColumnDefinition Width="30*"></ColumnDefinition>
+                                        <ColumnDefinition Width="113*"></ColumnDefinition>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 0 10 0 ">K =</TextBlock>
-                                    <TextBox x:Name="numberOfColourTextBox" Grid.Column="1" Height="20" Width="50" HorizontalAlignment="Left" VerticalAlignment="Top" PreviewTextInput="KernalRCell_PreviewTextInput">1</TextBox>
+                                    <TextBox x:Name="numberOfColour_G_TextBox" Grid.Column="0" Height="20" Width="50" HorizontalAlignment="Left" VerticalAlignment="Center" PreviewTextInput="KernalRCell_PreviewTextInput" Margin="0,2,0,1">1</TextBox>
+                                    <CheckBox IsChecked="False" x:Name="grayImageDitheringCheckBox" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Checked="grayImageDitheringCheckBox_Checked" Unchecked="grayImageDitheringCheckBox_Unchecked"/>
+                                    <TextBlock Grid.Column="2"  FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center">Is image in one color?</TextBlock>
                                 </Grid>
-                            </UniformGrid>
+                                <TextBlock Grid.Row="3" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 0 10 0 " Height="20" Width="20">B =</TextBlock>
+                                <TextBox x:Name="numberOfColour_B_TextBox" Grid.Row="3" Grid.Column="1" Height="20" Width="50" HorizontalAlignment="Left" VerticalAlignment="Center" PreviewTextInput="KernalRCell_PreviewTextInput" Margin="0,2,0,1">1</TextBox>
+                            </Grid>
 
                         </Grid>
                     </TabItem>

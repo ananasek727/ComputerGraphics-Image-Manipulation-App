@@ -930,53 +930,101 @@ namespace WPF_filter
         
         private void averageDitheringButton_Click(object sender, RoutedEventArgs e)
         {
-            if(Int32.Parse(numberOfColourTextBox.Text)>255)
+            if (grayImageDitheringCheckBox.IsChecked == true)
+            {
+                numberOfColour_B_TextBox.Text = numberOfColour_G_TextBox.Text;
+                numberOfColour_R_TextBox.Text = numberOfColour_R_TextBox.Text;
+            }
+
+
+            if(Int32.Parse(numberOfColour_R_TextBox.Text)>255 | Int32.Parse(numberOfColour_G_TextBox.Text) > 255 |
+                Int32.Parse(numberOfColour_B_TextBox.Text) > 255)
             {
                 var massage = MessageBox.Show("Too much for mee!!!");
                 return;
             }            
-            if (!((Int32.Parse(numberOfColourTextBox.Text)!=0)&&((Int32.Parse(numberOfColourTextBox.Text) &
-                (Int32.Parse(numberOfColourTextBox.Text) - 1)) == 0)))
+            if (!((Int32.Parse(numberOfColour_R_TextBox.Text)!=0)
+                &&((Int32.Parse(numberOfColour_R_TextBox.Text) &
+                (Int32.Parse(numberOfColour_R_TextBox.Text) - 1)) == 0)) |
+                !((Int32.Parse(numberOfColour_G_TextBox.Text) != 0)
+                && ((Int32.Parse(numberOfColour_G_TextBox.Text) &
+                (Int32.Parse(numberOfColour_G_TextBox.Text) - 1)) == 0)) |
+                !((Int32.Parse(numberOfColour_B_TextBox.Text) != 0)
+                && ((Int32.Parse(numberOfColour_B_TextBox.Text) &
+                (Int32.Parse(numberOfColour_B_TextBox.Text) - 1)) == 0)))
             {
                 var massage = MessageBox.Show("Don't you know powers of two!!!");
                 return;
             }
-
+            
             myRGB[,] myRGBs = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
             imageToPixet2dArray(ref myRGBs);
-            int[] array = new int[256];
-            for(int i=0; i < 256; i++)
+            int[] arrayR = new int[256];
+            int[] arrayG = new int[256];
+            int[] arrayB = new int[256];
+
+            for (int i=0; i < 256; i++)
             {
-                array[i] = 0;
+                arrayR[i] = 0;
+                arrayG[i] = 0;
+                arrayB[i] = 0;
             }
             for(int i = 0; i < myRGBs.GetLength(0); i++)
             {
                 for(int j=0; j<myRGBs.GetLength(1); j++)
                 {
-                    array[myRGBs[i,j].B]++;
+                    arrayR[myRGBs[i,j].B]++;
+                    arrayG[myRGBs[i, j].B]++;
+                    arrayB[myRGBs[i, j].B]++;
+
                 }
             }
-            List<int> list = new List<int>();
-            threshold(0, 255, Int32.Parse(numberOfColourTextBox.Text),ref list,ref array);            
-            list.Sort();
-            list.Add(255);            
+            List<int> listR = new List<int>();
+            List<int> listG = new List<int>();
+            List<int> listB = new List<int>();
+
+            threshold(0, 255, Int32.Parse(numberOfColour_R_TextBox.Text),ref listR,ref arrayR);
+            threshold(0, 255, Int32.Parse(numberOfColour_G_TextBox.Text),ref listG,ref arrayG);
+            threshold(0, 255, Int32.Parse(numberOfColour_B_TextBox.Text), ref listB, ref arrayB);
+            listR.Sort();
+            listG.Sort();
+            listB.Sort();
+            listR.Add(255);
+            listG.Add(255);
+            listB.Add(255);
             myRGB[,] result = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
             for(int i = 0; i < result.GetLength(0); i++)
             {
                 for(int j=0; j<result.GetLength(1); j++)
                 {
-                    for(int k=0; k < list.Count; k++)
+                    result[i, j] = new myRGB(0,0,0);
+                    for(int k=0; k < listR.Count; k++)
                     {
-                        if (myRGBs[i, j].B <= list[k])
+                        if (myRGBs[i, j].R <= listR[k])
                         {
-                            var tmp = new myRGB((int)(255 / (list.Count + 1) * k), (int)(255 / (list.Count + 1) * k),
-                                (int)(255 / (list.Count + 1) * k));
-                            result[i, j] = tmp;
+                            result[i, j].R = (int)(255 / listR.Count * k);
+                            break;
+                        }
+                    }
+                    for (int k = 0; k < listG.Count; k++)
+                    {
+                        if (myRGBs[i, j].G <= listG[k])
+                        {
+                            result[i, j].G = (int)(255 / listG.Count * k);
+                            break;
+                        }
+                    }
+                    for (int k = 0; k < listB.Count; k++)
+                    {
+                        if (myRGBs[i, j].B <= listB[k])
+                        {
+                            result[i, j].B = (int)(255/ listB.Count * k);
                             break;
                         }
                     }
                 }
             }
+
             int z = 0;
             var stride = convertedBitmpImage.Width * Constans.pixel_size;
             byte[] pixelsv2 = new byte[(int)(stride) * convertedBitmpImage.PixelHeight];
@@ -997,10 +1045,20 @@ namespace WPF_filter
             var rez = BitmapSource.Create(convertedBitmpImage.PixelWidth, convertedBitmpImage.PixelHeight, convertedBitmpImage.DpiX,
                 convertedBitmpImage.DpiY, convertedBitmpImage.Format,
                 null, pixelsv2, (int)stride);
-
             convertedBitmpImage = BitmapSourceToBitmapImage(rez);
         }
 
+        private void grayImageDitheringCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            numberOfColour_B_TextBox.IsEnabled = false;
+            numberOfColour_R_TextBox.IsEnabled = false;
+        }
+
+        private void grayImageDitheringCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            numberOfColour_B_TextBox.IsEnabled = true;
+            numberOfColour_R_TextBox.IsEnabled = true;
+        }
     }
 
 }
