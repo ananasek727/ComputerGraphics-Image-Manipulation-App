@@ -39,7 +39,7 @@ namespace WPF_filter
                 this.sumB = sumB;
                 this.count = count;
                 this.children = new Node[8];
-                for(int i = 0; i<8; i++)
+                for (int i = 0; i < 8; i++)
                 {
                     this.children[i] = null;
                 }
@@ -65,54 +65,17 @@ namespace WPF_filter
                 this.leafCount = leafCount;
                 this.maxLeaves = maxLeaves;
                 this.innerNodes = new List<Node>[8];
-                for (int i = 0; i<8; i++)
+                for (int i = 0; i < 8; i++)
                 {
-                    this.innerNodes[i] = new List<Node>(8);
+                    this.innerNodes[i] = new List<Node>();
                     for (int j = 0; j < 8; j++)
                     {
-                        this.innerNodes[i].Add(null);
+                        //this.innerNodes[i].Add(null);
                     }
                 }
             }
 
-            internal void ReduceTree()
-            {
-                int z = 8;
-                for (int i=7; i >= 0; i--)
-                {
-                    z--;
-                    if (!(innerNodes[i]== null))
-                        break;
 
-                }
-                
-                Node node= new Node();
-                for( int j =0; j < innerNodes[z].Count(); j++)
-                {
-                    if (!(innerNodes[z][j] == null))
-                    {
-                        node = innerNodes[z][j];
-                        innerNodes[z][j] = null;
-                        break;
-                    }
-                }
-                int removed = 0;
-                for (int k = 0; k < 8; k++)
-                {
-                    if (!(node.children[k] == null))
-                    {
-                        node.sumR += node.children[k].sumR;
-                        node.sumG += node.children[k].sumG;
-                        node.sumB += node.children[k].sumB;
-                        node.count += node.children[k].count;
-                        
-                        node.children[k] = null;
-                        removed++;
-                    }
-                }
-                node.IsLeaf = true;
-                leafCount += (byte)(1-removed);
-            }
         }
 
         public class customFilter
@@ -234,7 +197,7 @@ namespace WPF_filter
             memoryStream.Close();
             bitmapImage.Freeze();
             return bitmapImage;
-           
+
 
         }
         public BitmapImage BitmapImageToBitmapImage(BitmapImage bitmapSource)
@@ -453,8 +416,8 @@ namespace WPF_filter
             myRGB[,] myRGBs = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
             imageToPixet2dArray(ref myRGBs);
             myRGB[,] result = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
-            applyFilter(myRGBs,1,1,BasicConvolutionFilters.sharpen_s,0,
-                BasicConvolutionFilters.sharpen,ref result);
+            applyFilter(myRGBs, 1, 1, BasicConvolutionFilters.sharpen_s, 0,
+                BasicConvolutionFilters.sharpen, ref result);
         }
 
         private void edge_detectionButton_Click(object sender, RoutedEventArgs e)
@@ -476,7 +439,7 @@ namespace WPF_filter
 
             myRGB[,] result = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
             applyFilter(myRGBs, 1, 1, BasicConvolutionFilters.emboss_filters_s, 0,
-                BasicConvolutionFilters.emboss_filters,ref result);
+                BasicConvolutionFilters.emboss_filters, ref result);
 
         }
 
@@ -510,7 +473,7 @@ namespace WPF_filter
         private void KernalRCell_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             //Regex regex = new Regex("[+-]?\b[0-9]+\b");
-            string pattern = @"-?\d+$"; 
+            string pattern = @"-?\d+$";
             if (Regex.IsMatch(e.Text, pattern))
             {
                 e.Handled = false;
@@ -519,7 +482,7 @@ namespace WPF_filter
             else
             {
                 e.Handled = true;
-                
+
             }
         }
         private void grayScale_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -582,7 +545,7 @@ namespace WPF_filter
                     sum.B = sum.B / 256 < 255 ? sum.B / 256 : 255;
                     sum.R = sum.R / 256 < 255 ? sum.R / 256 : 255;
                     sum.G = sum.G / 256 < 255 ? sum.G / 256 : 255;
-                    
+
                     for (int k = 0; k < 16; k++)
                     {
                         for (int l = 0; l < 16; l++)
@@ -712,11 +675,11 @@ namespace WPF_filter
             }
 
             myRGB[,] result = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
-            applyFilter(myRGBs, anchorx, anchory, edit_kernal_s, offset,edit_kernal, ref result);
+            applyFilter(myRGBs, anchorx, anchory, edit_kernal_s, offset, edit_kernal, ref result);
 
         }
 
-        private void applyFilter(myRGB[,] initialImage,int anchorx, int anchory,int divisor, int offset,int[,] kernal, ref myRGB[,] result)
+        private void applyFilter(myRGB[,] initialImage, int anchorx, int anchory, int divisor, int offset, int[,] kernal, ref myRGB[,] result)
         {
             var stride = convertedBitmpImage.Width * Constans.pixel_size;
             for (int x = 0; x < initialImage.GetLength(0); x++)
@@ -777,7 +740,7 @@ namespace WPF_filter
             byte[] pixels = new byte[(int)(stride) * convertedBitmpImage.PixelHeight];
             convertedBitmpImage.CopyPixels(pixels, (int)stride, 0);
             myRGB[] myRGBs_helper = new myRGB[(int)((pixels.Length) / 4)];
-            
+
             for (int i = 0, h = 0; i < pixels.Length; i = i + 4, h++)
             {
                 myRGBs_helper[h] = new myRGB(pixels[i], pixels[i + 1], pixels[i + 2]);
@@ -791,7 +754,7 @@ namespace WPF_filter
                 }
             }
         }
-        
+
         private void loadFliter_Click(object sender, RoutedEventArgs e)
         {
 
@@ -972,9 +935,9 @@ namespace WPF_filter
             {
                 for (int j = 0; j < myRGBs.GetLength(1); j++)
                 {
-                    int brightness = (int)(0.2126 * myRGBs[i, j].R + 0.7152 * myRGBs[i, j].G + 0.0722 * myRGBs[i,j].B);
+                    int brightness = (int)(0.2126 * myRGBs[i, j].R + 0.7152 * myRGBs[i, j].G + 0.0722 * myRGBs[i, j].B);
 
-                    
+
                     result[i, j] = new myRGB(brightness > 0 ? brightness : 0, brightness > 0 ? brightness : 0, brightness > 0 ? brightness : 0);
 
                 }
@@ -1001,50 +964,50 @@ namespace WPF_filter
 
             convertedBitmpImage = BitmapSourceToBitmapImage(tmp);
         }
-        private float get_mean(int left, int right,ref int[] array)
+        private float get_mean(int left, int right, ref int[] array)
         {
             float mean = 0;
 
-            for(int i = left,n=0; i <= right; i++)
+            for (int i = left, n = 0; i <= right; i++)
             {
                 int prev = n;
                 n += array[i];
-                mean += ((float)i/Math.Max(1,prev))*(float)array[i];
-                mean /= Math.Max(1,n);
-                mean *= Math.Max(1,prev);
+                mean += ((float)i / Math.Max(1, prev)) * (float)array[i];
+                mean /= Math.Max(1, n);
+                mean *= Math.Max(1, prev);
             }
             return mean;
         }
-        private void threshold(int left,int right, int n, ref List<int> thresholds ,ref int[] array)
+        private void threshold(int left, int right, int n, ref List<int> thresholds, ref int[] array)
         {
             if (n == 1)
             {
                 return;
             }
-            float mean = get_mean(left, right,ref array);
+            float mean = get_mean(left, right, ref array);
             int limit = (int)Math.Round(mean);
             thresholds.Add(limit);
             threshold(left, limit, n / 2, ref thresholds, ref array);
-            threshold(Math.Min(limit+1,255),right,n/2, ref thresholds, ref array);
+            threshold(Math.Min(limit + 1, 255), right, n / 2, ref thresholds, ref array);
         }
-        
+
         private void averageDitheringButton_Click(object sender, RoutedEventArgs e)
         {
             if (grayImageDitheringCheckBox.IsChecked == true)
             {
                 numberOfColour_B_TextBox.Text = numberOfColour_G_TextBox.Text;
-                numberOfColour_R_TextBox.Text = numberOfColour_R_TextBox.Text;
+                numberOfColour_R_TextBox.Text = numberOfColour_G_TextBox.Text;
             }
 
 
-            if(Int32.Parse(numberOfColour_R_TextBox.Text)>255 | Int32.Parse(numberOfColour_G_TextBox.Text) > 255 |
+            if (Int32.Parse(numberOfColour_R_TextBox.Text) > 255 | Int32.Parse(numberOfColour_G_TextBox.Text) > 255 |
                 Int32.Parse(numberOfColour_B_TextBox.Text) > 255)
             {
                 var massage = MessageBox.Show("Too much for mee!!!");
                 return;
-            }            
-            if (!((Int32.Parse(numberOfColour_R_TextBox.Text)!=0)
-                &&((Int32.Parse(numberOfColour_R_TextBox.Text) &
+            }
+            if (!((Int32.Parse(numberOfColour_R_TextBox.Text) != 0)
+                && ((Int32.Parse(numberOfColour_R_TextBox.Text) &
                 (Int32.Parse(numberOfColour_R_TextBox.Text) - 1)) == 0)) |
                 !((Int32.Parse(numberOfColour_G_TextBox.Text) != 0)
                 && ((Int32.Parse(numberOfColour_G_TextBox.Text) &
@@ -1053,27 +1016,27 @@ namespace WPF_filter
                 && ((Int32.Parse(numberOfColour_B_TextBox.Text) &
                 (Int32.Parse(numberOfColour_B_TextBox.Text) - 1)) == 0)))
             {
-                var massage = MessageBox.Show("Don't you know powers of two!!!");
+                var massage = MessageBox.Show("Don't you know the powers of two!!!");
                 return;
             }
-            
+
             myRGB[,] myRGBs = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
             imageToPixet2dArray(ref myRGBs);
             int[] arrayR = new int[256];
             int[] arrayG = new int[256];
             int[] arrayB = new int[256];
 
-            for (int i=0; i < 256; i++)
+            for (int i = 0; i < 256; i++)
             {
                 arrayR[i] = 0;
                 arrayG[i] = 0;
                 arrayB[i] = 0;
             }
-            for(int i = 0; i < myRGBs.GetLength(0); i++)
+            for (int i = 0; i < myRGBs.GetLength(0); i++)
             {
-                for(int j=0; j<myRGBs.GetLength(1); j++)
+                for (int j = 0; j < myRGBs.GetLength(1); j++)
                 {
-                    arrayR[myRGBs[i,j].B]++;
+                    arrayR[myRGBs[i, j].B]++;
                     arrayG[myRGBs[i, j].B]++;
                     arrayB[myRGBs[i, j].B]++;
 
@@ -1083,8 +1046,8 @@ namespace WPF_filter
             List<int> listG = new List<int>();
             List<int> listB = new List<int>();
 
-            threshold(0, 255, Int32.Parse(numberOfColour_R_TextBox.Text),ref listR,ref arrayR);
-            threshold(0, 255, Int32.Parse(numberOfColour_G_TextBox.Text),ref listG,ref arrayG);
+            threshold(0, 255, Int32.Parse(numberOfColour_R_TextBox.Text), ref listR, ref arrayR);
+            threshold(0, 255, Int32.Parse(numberOfColour_G_TextBox.Text), ref listG, ref arrayG);
             threshold(0, 255, Int32.Parse(numberOfColour_B_TextBox.Text), ref listB, ref arrayB);
             listR.Sort();
             listG.Sort();
@@ -1093,16 +1056,17 @@ namespace WPF_filter
             listG.Add(255);
             listB.Add(255);
             myRGB[,] result = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
-            for(int i = 0; i < result.GetLength(0); i++)
+            for (int i = 0; i < result.GetLength(0); i++)
             {
-                for(int j=0; j<result.GetLength(1); j++)
+                for (int j = 0; j < result.GetLength(1); j++)
                 {
-                    result[i, j] = new myRGB(0,0,0);
-                    for(int k=0; k < listR.Count; k++)
+                    result[i, j] = new myRGB(0, 0, 0);
+                    for (int k = 0; k < listR.Count; k++)
                     {
                         if (myRGBs[i, j].R <= listR[k])
                         {
-                            result[i, j].R = (int)(255 / listR.Count * k);
+
+                            result[i, j].R = (int)(255 / (listR.Count-1)*k);
                             break;
                         }
                     }
@@ -1110,7 +1074,7 @@ namespace WPF_filter
                     {
                         if (myRGBs[i, j].G <= listG[k])
                         {
-                            result[i, j].G = (int)(255 / listG.Count * k);
+                            result[i, j].G = (int)(255 / (listG.Count - 1) * k);
                             break;
                         }
                     }
@@ -1118,7 +1082,7 @@ namespace WPF_filter
                     {
                         if (myRGBs[i, j].B <= listB[k])
                         {
-                            result[i, j].B = (int)(255/ listB.Count * k);
+                            result[i, j].B = (int)(255 / (listB.Count - 1) * k);
                             break;
                         }
                     }
@@ -1159,7 +1123,7 @@ namespace WPF_filter
             numberOfColour_B_TextBox.IsEnabled = true;
             numberOfColour_R_TextBox.IsEnabled = true;
         }
-        
+
         private uint childIndex(myRGB color, uint depth)
         {
             int byteR = (color.R >> (int)(7 - depth) & 0x1);
@@ -1184,76 +1148,155 @@ namespace WPF_filter
             return newNode;
         }
 
-        private void add(ref Octree octree,myRGB color)
+        private void add(ref Octree octree, myRGB color)
         {
-            if (octree.root==null)
+            if (octree.root == null)
             {
                 octree.root = createNode(ref octree, 0);
-                
+
             }
-            addRecursive(ref octree,ref octree.root,color,0);
+            addRecursive(ref octree, ref octree.root, color, 0);
         }
-        private void addRecursive(ref Octree octree,ref Node parent, myRGB color, uint depth)
+        private void addRecursive(ref Octree octree, ref Node parent, myRGB color, uint depth)
         {
             if (parent.IsLeaf)
             {
                 parent.sumR += (uint)color.R;
                 parent.sumG += (uint)color.G;
                 parent.sumB += (uint)color.B;
-                parent.count= parent.count + 1;
+                parent.count = parent.count + 1;
             }
             else
             {
-                var i = childIndex(color,depth);
+                var i = childIndex(color, depth);
                 if (parent.children[i] == null)
                 {
                     parent.children[i] = createNode(ref octree, depth + 1);
                 }
-                
-                addRecursive(ref octree,ref parent.children[i], color, depth + 1);
+                addRecursive(ref octree, ref parent.children[i], color, depth + 1);
             }
         }
 
-        private myRGB find(Octree octree, myRGB myRGB)
+        private myRGB find(ref Octree octree, myRGB myRGB)
         {
             var node = octree.root;
-            uint z = 0;
+            int z = 0;
             while (!(node.IsLeaf))
-            {            
-                var i = childIndex(myRGB,z);
-                node = node.children[i];
-                z++;
-            }
-            return new myRGB((int)(node.sumR/node.count),(int)(node.sumG/node.count),(int)(node.sumB/node.count));
-        }
+            {
 
+                var i = childIndex(myRGB, (uint)z);
+                node = node.children[i];
+                ++z;
+            }
+            return new myRGB((int)Math.Floor((double)node.sumR / (double)node.count),
+                (int)Math.Floor((double)node.sumG / (double)node.count), (int)Math.Floor((double)node.sumB / (double)node.count));
+        }
+        public void ReduceTree(ref Octree octree)
+        {
+            int z = 8;
+            for (int i = 7; i >= 0; i--)
+            {
+                z--;
+                if ((octree.innerNodes[i].Any<Node>() == true))
+                    break;
+
+            }
+
+            Node node = new Node();
+            for (int j = 0; j < octree.innerNodes[z].Count(); j++)
+            {
+                if ((octree.innerNodes[z][j] != null))
+                {
+                    node = octree.innerNodes[z][j];
+                    octree.innerNodes[z].RemoveAt(j);
+                    break;
+                }
+            }
+            int removed = 0;
+            for (int k = 0; k < 8; k++)
+            {
+                if (!(node.children[k] == null))
+                {
+                    node.sumR += node.children[k].sumR;
+                    node.sumG += node.children[k].sumG;
+                    node.sumB += node.children[k].sumB;
+                    node.count += node.children[k].count;
+                    node.children[k] = null;
+                    removed++;
+                }
+            }
+            node.IsLeaf = true;
+            octree.leafCount += (byte)(1 - removed);
+            //Node node = null;
+            //for (int i = 7; i >= 0; i--)
+            //{
+
+            //    if (octree.innerNodes[i].Any<Node>() == true)
+            //    {                   
+            //        for (int j = 0; j < octree.innerNodes[i].Count; j++)
+            //        {
+            //            if (octree.innerNodes[i][j] != null)
+            //            {
+            //                node = octree.innerNodes[i][j];
+            //                octree.innerNodes[i].RemoveAt(j);
+            //                break;
+            //            }
+            //        }
+            //    }
+            //    if (node != null)
+            //        break;
+            // }
+            //        int removed = 0;
+            //        for (int k = 0; k < 8; k++)
+            //        {
+            //            if (node.children[k] != null)
+            //            {
+            //                node.sumR += node.children[k].sumR;
+            //                node.sumG += node.children[k].sumG;
+            //                node.sumB += node.children[k].sumB;
+            //                node.count += node.children[k].count;
+            //                node.children[k] = null;
+            //                removed++;
+            //            }
+            //        }
+            //        node.IsLeaf = true;
+            //        octree.leafCount += (byte)(1 - removed);
+
+
+
+        }
         private void octreeColor_Button_Click(object sender, RoutedEventArgs e)
         {
             myRGB[,] myRGBs = new myRGB[(int)convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
             imageToPixet2dArray(ref myRGBs);
-            ; //change
-            var octree = new Octree(root: null, leafCount:0, maxLeaves:(byte)Int32.Parse(octreeColor_TextBox.Text));
+            ;
+            var octree = new Octree(root: null, leafCount: 0, maxLeaves: (byte)Int32.Parse(octreeColor_TextBox.Text));
             for (int i = 0; i < myRGBs.GetLength(0); i++)
             {
                 for (int j = 0; j < myRGBs.GetLength(1); j++)
                 {
-                    
-                        add(ref octree, myRGBs[i, j]);
 
+                    add(ref octree, myRGBs[i, j]);
+                    while (octree.leafCount > (byte)Int32.Parse(octreeColor_TextBox.Text))
+                    {
+                        ReduceTree(ref octree);
+                    }
 
 
                 }
             }
-            while (octree.leafCount > (byte)Int32.Parse(octreeColor_TextBox.Text))
-            {
-                octree.ReduceTree();
-            }
+
             myRGB[,] result = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
-            for (int i = 0;i < myRGBs.GetLength(0); i++)
+            int ff = 0;
+            for (int i = 0; i < myRGBs.GetLength(0); i++)
             {
-                for(int j = 0;j < myRGBs.GetLength(1); j++)
+                for (int j = 0; j < myRGBs.GetLength(1); j++)
                 {
-                    result[i, j] = find(octree, myRGBs[i,j]);
+                    result[i, j] = find(ref octree, myRGBs[i, j]);
+                    if (result[i, j].R != myRGBs[i, j].R || result[i, j].G != myRGBs[i, j].G || result[i, j].B != myRGBs[i, j].B)
+                    {
+                        ff++;
+                    }
                 }
             }
 

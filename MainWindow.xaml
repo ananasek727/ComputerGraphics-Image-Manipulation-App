@@ -20,6 +20,26 @@
                 </Style>
             </Style.Resources>
         </Style>
+        <Storyboard x:Key="RainbowAnimation">
+            <ColorAnimation
+            Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"
+            From="Red" To="Orange" Duration="0:0:1" />
+            <ColorAnimation
+            Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"
+            From="Orange" To="Yellow" Duration="0:0:1" BeginTime="0:0:1" />
+            <ColorAnimation
+            Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"
+            From="Yellow" To="Green" Duration="0:0:1" BeginTime="0:0:2" />
+            <ColorAnimation
+            Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"
+            From="Green" To="Blue" Duration="0:0:1" BeginTime="0:0:3" />
+            <ColorAnimation
+            Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"
+            From="Blue" To="Indigo" Duration="0:0:1" BeginTime="0:0:4" />
+            <ColorAnimation
+            Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"
+            From="Indigo" To="Violet" Duration="0:0:1" BeginTime="0:0:5" />
+        </Storyboard>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -188,23 +208,14 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Row="0"  Grid.ColumnSpan="2"  HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" FontStyle="Italic">Average dithering algorithm</TextBlock>
                             <Button x:Name="averageDitheringButton" Grid.Column="0" Grid.Row="1" Height="30" Width="110" Click="averageDitheringButton_Click">
-                                <Button.Style>
-                                    <Style TargetType="Button">
-                                        <Setter Property="Background" Value="White" />
-                                        <Style.Triggers>
-                                            <EventTrigger RoutedEvent="Loaded">
-                                                <BeginStoryboard>
-                                                    <Storyboard>
-                                                        <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)" To="Blue" Duration="0:0:2"
-                                                                        AutoReverse="True"
-                                                                        RepeatBehavior="Forever">
-                                                        </ColorAnimation>
-                                                    </Storyboard>
-                                                </BeginStoryboard>
-                                            </EventTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Button.Style>
+                                <Button.Background>
+                                    <SolidColorBrush Color="Red"/>
+                                </Button.Background>
+                                <Button.Triggers>
+                                    <EventTrigger RoutedEvent="Loaded">
+                                        <BeginStoryboard Storyboard="{StaticResource RainbowAnimation}" />
+                                    </EventTrigger>
+                                </Button.Triggers>
                                 Average dithering
                             </Button>
                             <Grid Grid.Row="1" Grid.Column="1">
@@ -235,17 +246,37 @@
                                 <TextBlock Grid.Row="3" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 0 10 0 " Height="20" Width="20">B =</TextBlock>
                                 <TextBox x:Name="numberOfColour_B_TextBox" Grid.Row="3" Grid.Column="1" Height="20" Width="50" HorizontalAlignment="Left" VerticalAlignment="Center" PreviewTextInput="KernalRCell_PreviewTextInput" Margin="0,2,0,1">1</TextBox>
                             </Grid>
-
                         </Grid>
                     </TabItem>
-                    <TabItem Header="Octree Colour">
+                    <TabItem Header="Colour quantization">
                         <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="50px"></RowDefinition>
+                                <RowDefinition Height="*"></RowDefinition>
+                            </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition></ColumnDefinition>
                                 <ColumnDefinition></ColumnDefinition>
                             </Grid.ColumnDefinitions>
-                            <Button Grid.Column="0" x:Name="octreeColor_Button" MaxHeight="50" MaxWidth="50" Click="octreeColor_Button_Click">Let's go!!</Button>
-                            <TextBox Grid.Column="1" x:Name="octreeColor_TextBox" Height="50" Background="AliceBlue"></TextBox>
+                            <TextBlock Grid.Row="0"  Grid.ColumnSpan="2"  HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" FontStyle="Italic">Octree colour quantization</TextBlock>
+                            <Button Grid.Row="1" Grid.Column="0" x:Name="octreeColor_Button" MaxHeight="50" MaxWidth="1000" Height="50" Width="100" Click="octreeColor_Button_Click" VerticalAlignment="Center">
+                                <Button.Background>
+                                    <SolidColorBrush Color="Red"/>
+                                </Button.Background>
+                                <Button.Triggers>
+                                    <EventTrigger RoutedEvent="Loaded">
+                                        <BeginStoryboard Storyboard="{StaticResource RainbowAnimation}" />
+                                    </EventTrigger>
+                                </Button.Triggers>
+                                Let's go!!</Button>
+                            <Grid Grid.Row="1" Grid.Column="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0">Select maximum <LineBreak/> numbers of colors</TextBlock>
+                                <TextBox Grid.Row="1" x:Name="octreeColor_TextBox" Height="20" Background="AliceBlue" Width="100" VerticalAlignment="Center" HorizontalAlignment="Center" PreviewTextInput="KernalRCell_PreviewTextInput"></TextBox>
+                            </Grid>
                         </Grid>
                     </TabItem>
                 </TabControl>
