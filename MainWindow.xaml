@@ -238,6 +238,16 @@
 
                         </Grid>
                     </TabItem>
+                    <TabItem Header="Octree Colour">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" x:Name="octreeColor_Button" MaxHeight="50" MaxWidth="50" Click="octreeColor_Button_Click">Let's go!!</Button>
+                            <TextBox Grid.Column="1" x:Name="octreeColor_TextBox" Height="50" Background="AliceBlue"></TextBox>
+                        </Grid>
+                    </TabItem>
                 </TabControl>
             </Border>
         </Grid>

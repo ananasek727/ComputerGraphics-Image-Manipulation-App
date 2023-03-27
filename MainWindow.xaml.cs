@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Design.Serialization;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -22,6 +23,98 @@ namespace WPF_filter
 
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        public class Node
+        {
+            public bool IsLeaf;
+            public uint sumR;
+            public uint sumG;
+            public uint sumB;
+            public uint count;
+            public Node[] children;//max 8
+            public Node(bool isLeaf, uint sumR, uint sumG, uint sumB, uint count)
+            {
+                IsLeaf = isLeaf;
+                this.sumR = sumR;
+                this.sumG = sumG;
+                this.sumB = sumB;
+                this.count = count;
+                this.children = new Node[8];
+                for(int i = 0; i<8; i++)
+                {
+                    this.children[i] = null;
+                }
+            }
+            public Node()
+            {
+                this.children = new Node[8];
+                for (int i = 0; i < 8; i++)
+                {
+                    this.children[i] = null;
+                }
+            }
+        }
+        public class Octree
+        {
+            public Node root;
+            public byte leafCount;
+            public byte maxLeaves;
+            public List<Node>[] innerNodes; //non-leaf
+            public Octree(Node root, byte leafCount, byte maxLeaves)
+            {
+                this.root = root;
+                this.leafCount = leafCount;
+                this.maxLeaves = maxLeaves;
+                this.innerNodes = new List<Node>[8];
+                for (int i = 0; i<8; i++)
+                {
+                    this.innerNodes[i] = new List<Node>(8);
+                    for (int j = 0; j < 8; j++)
+                    {
+                        this.innerNodes[i].Add(null);
+                    }
+                }
+            }
+
+            internal void ReduceTree()
+            {
+                int z = 8;
+                for (int i=7; i >= 0; i--)
+                {
+                    z--;
+                    if (!(innerNodes[i]== null))
+                        break;
+
+                }
+                
+                Node node= new Node();
+                for( int j =0; j < innerNodes[z].Count(); j++)
+                {
+                    if (!(innerNodes[z][j] == null))
+                    {
+                        node = innerNodes[z][j];
+                        innerNodes[z][j] = null;
+                        break;
+                    }
+                }
+                int removed = 0;
+                for (int k = 0; k < 8; k++)
+                {
+                    if (!(node.children[k] == null))
+                    {
+                        node.sumR += node.children[k].sumR;
+                        node.sumG += node.children[k].sumG;
+                        node.sumB += node.children[k].sumB;
+                        node.count += node.children[k].count;
+                        
+                        node.children[k] = null;
+                        removed++;
+                    }
+                }
+                node.IsLeaf = true;
+                leafCount += (byte)(1-removed);
+            }
+        }
+
         public class customFilter
         {
             public string rowN;
@@ -113,6 +206,12 @@ namespace WPF_filter
                 B = b;
 
             }
+            public override string ToString()
+            {
+                return R.ToString() + "," + G.ToString() + "," + B.ToString();
+            }
+
+
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -135,6 +234,7 @@ namespace WPF_filter
             memoryStream.Close();
             bitmapImage.Freeze();
             return bitmapImage;
+           
 
         }
         public BitmapImage BitmapImageToBitmapImage(BitmapImage bitmapSource)
@@ -1058,6 +1158,127 @@ namespace WPF_filter
         {
             numberOfColour_B_TextBox.IsEnabled = true;
             numberOfColour_R_TextBox.IsEnabled = true;
+        }
+        
+        private uint childIndex(myRGB color, uint depth)
+        {
+            int byteR = (color.R >> (int)(7 - depth) & 0x1);
+            int byteG = (color.G >> (int)(7 - depth) & 0x1);
+            int byteB = (color.B >> (int)(7 - depth) & 0x1);
+
+            return (uint)(byteR << 2 | byteG << 1 | byteB);
+        }
+        private Node createNode(ref Octree octree, uint depth)
+        {
+            var newNode = new Node();
+            newNode.IsLeaf = (depth == 8);
+            if (!newNode.IsLeaf)
+            {
+                octree.innerNodes[depth].Add(newNode);
+            }
+            else
+            {
+                octree.leafCount++;
+            }
+
+            return newNode;
+        }
+
+        private void add(ref Octree octree,myRGB color)
+        {
+            if (octree.root==null)
+            {
+                octree.root = createNode(ref octree, 0);
+                
+            }
+            addRecursive(ref octree,ref octree.root,color,0);
+        }
+        private void addRecursive(ref Octree octree,ref Node parent, myRGB color, uint depth)
+        {
+            if (parent.IsLeaf)
+            {
+                parent.sumR += (uint)color.R;
+                parent.sumG += (uint)color.G;
+                parent.sumB += (uint)color.B;
+                parent.count= parent.count + 1;
+            }
+            else
+            {
+                var i = childIndex(color,depth);
+                if (parent.children[i] == null)
+                {
+                    parent.children[i] = createNode(ref octree, depth + 1);
+                }
+                
+                addRecursive(ref octree,ref parent.children[i], color, depth + 1);
+            }
+        }
+
+        private myRGB find(Octree octree, myRGB myRGB)
+        {
+            var node = octree.root;
+            uint z = 0;
+            while (!(node.IsLeaf))
+            {            
+                var i = childIndex(myRGB,z);
+                node = node.children[i];
+                z++;
+            }
+            return new myRGB((int)(node.sumR/node.count),(int)(node.sumG/node.count),(int)(node.sumB/node.count));
+        }
+
+        private void octreeColor_Button_Click(object sender, RoutedEventArgs e)
+        {
+            myRGB[,] myRGBs = new myRGB[(int)convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+            imageToPixet2dArray(ref myRGBs);
+            ; //change
+            var octree = new Octree(root: null, leafCount:0, maxLeaves:(byte)Int32.Parse(octreeColor_TextBox.Text));
+            for (int i = 0; i < myRGBs.GetLength(0); i++)
+            {
+                for (int j = 0; j < myRGBs.GetLength(1); j++)
+                {
+                    
+                        add(ref octree, myRGBs[i, j]);
+
+
+
+                }
+            }
+            while (octree.leafCount > (byte)Int32.Parse(octreeColor_TextBox.Text))
+            {
+                octree.ReduceTree();
+            }
+            myRGB[,] result = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+            for (int i = 0;i < myRGBs.GetLength(0); i++)
+            {
+                for(int j = 0;j < myRGBs.GetLength(1); j++)
+                {
+                    result[i, j] = find(octree, myRGBs[i,j]);
+                }
+            }
+
+            int z = 0;
+            var stride = convertedBitmpImage.Width * Constans.pixel_size;
+            byte[] pixelsv2 = new byte[(int)(stride) * convertedBitmpImage.PixelHeight];
+            for (int i = 0; i < result.GetLength(0); i++)
+            {
+                for (int j = 0; j < result.GetLength(1); j++)
+                {
+                    pixelsv2[z] = (byte)result[i, j].R;
+                    z++;
+                    pixelsv2[z] = (byte)result[i, j].G;
+                    z++;
+                    pixelsv2[z] = (byte)result[i, j].B;
+                    z++;
+                    pixelsv2[z] = (byte)255;
+                    z++;
+                }
+            }
+            var tmp = BitmapSource.Create(convertedBitmpImage.PixelWidth, convertedBitmpImage.PixelHeight, convertedBitmpImage.DpiX,
+                convertedBitmpImage.DpiY, convertedBitmpImage.Format,
+                null, pixelsv2, (int)stride);
+
+            convertedBitmpImage = BitmapSourceToBitmapImage(tmp);
         }
     }
 
