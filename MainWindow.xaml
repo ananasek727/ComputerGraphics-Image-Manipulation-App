@@ -279,6 +279,16 @@
                             </Grid>
                         </Grid>
                     </TabItem>
+                    <TabItem Header="Lab Task">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" x:Name="rgbToYcbcr_Button" MaxHeight="50" MaxWidth="1000" Height="50" Width="100" Click="rgbToYcbcr_Button_Click" VerticalAlignment="Center">>RGB->YCbCr</Button>
+                            <Button Grid.Column="1" x:Name="ycbcrToRgb" MaxHeight="50" MaxWidth="1000" Height="50" Width="100" Click="ycbcrToRgb_Click" VerticalAlignment="Center">>YCbCr->RGB</Button>
+                        </Grid>
+                    </TabItem>
                 </TabControl>
             </Border>
         </Grid>

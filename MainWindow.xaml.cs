@@ -1323,6 +1323,115 @@ namespace WPF_filter
 
             convertedBitmpImage = BitmapSourceToBitmapImage(tmp);
         }
+
+        private void rgbToYcbcr_Button_Click(object sender, RoutedEventArgs e)
+        {
+            myRGB[,] myRGBs = new myRGB[(int)convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+            imageToPixet2dArray(ref myRGBs);
+
+            myRGB[,] result = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+            for(int i = 0; i < myRGBs.GetLength(0); ++i)
+            {
+                for (int j = 0; j < myRGBs.GetLength(1); ++j)
+                {
+                    result[i, j] = new myRGB(0, 0, 0);
+                    ////Y
+                    //result[i, j].R = 16 + (((myRGBs[i, j].R << 6) + (myRGBs[i, j].R << 1) + (myRGBs[i, j].G << 7) + myRGBs[i, j].G + (myRGBs[i, j].B << 4) + (myRGBs[i, j].B << 3) + myRGBs[i, j].B) >> 8);
+                    ////Cb
+                    //result[i, j].G = 128 + ((-((myRGBs[i, j].R << 5) + (myRGBs[i, j].R << 2) + (myRGBs[i, j].R << 1)) - ((myRGBs[i, j].G << 6) + (myRGBs[i, j].G << 3) + (myRGBs[i, j].G << 1)) + (myRGBs[i, j].B << 7) - (myRGBs[i, j].B << 4)) >> 8);
+                    ////Cr
+                    //result[i, j].B = 128 + (((myRGBs[i, j].R << 7) - (myRGBs[i, j].R << 4) - ((myRGBs[i, j].G << 6) + (myRGBs[i, j].G << 5) - (myRGBs[i, j].G << 1)) - ((myRGBs[i, j].B << 4) + (myRGBs[i, j].B << 1))) >> 8);
+
+                    result[i, j].R = (int)((0.299 * myRGBs[i, j].R) + (0.587 * myRGBs[i, j].G) + (0.114 * myRGBs[i, j].B));
+                    result[i, j].G = (int)(128 - (0.168736 * myRGBs[i, j].R) - (0.331264 * myRGBs[i, j].G) + (0.5 * myRGBs[i, j].B));
+                    result[i, j].B = (int)(128 + (0.5 * myRGBs[i, j].R) - (0.418688 *
+                        myRGBs[i, j].G) - (0.081312 * myRGBs[i, j].B));
+
+
+
+                    result[i, j].R = (int)Math.Min(result[i, j].R, 255);
+                    result[i, j].R = (int)Math.Max(result[i, j].R, 0);
+                    result[i, j].G = (int)Math.Min(result[i, j].G, 255);
+                    result[i, j].G = (int)Math.Max(result[i, j].G, 0);
+                    result[i, j].B = (int)Math.Min(result[i, j].B, 255);
+                    result[i, j].B = (int)Math.Max(result[i, j].B, 0);
+                }
+            }
+            int z = 0;
+            var stride = convertedBitmpImage.Width * Constans.pixel_size;
+            byte[] pixelsv2 = new byte[(int)(stride) * convertedBitmpImage.PixelHeight];
+            for (int i = 0; i < result.GetLength(0); i++)
+            {
+                for (int j = 0; j < result.GetLength(1); j++)
+                {
+                    pixelsv2[z] = (byte)result[i, j].R;
+                    z++;
+                    pixelsv2[z] = (byte)result[i, j].G;
+                    z++;
+                    pixelsv2[z] = (byte)result[i, j].B;
+                    z++;
+                    pixelsv2[z] = (byte)255;
+                    z++;
+                }
+            }
+            var tmp = BitmapSource.Create(convertedBitmpImage.PixelWidth, convertedBitmpImage.PixelHeight, convertedBitmpImage.DpiX,
+                convertedBitmpImage.DpiY, convertedBitmpImage.Format,
+                null, pixelsv2, (int)stride);
+
+            convertedBitmpImage = BitmapSourceToBitmapImage(tmp);
+        }
+
+        private void ycbcrToRgb_Click(object sender, RoutedEventArgs e)
+        {
+            myRGB[,] myRGBs = new myRGB[(int)convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+            imageToPixet2dArray(ref myRGBs);
+
+            myRGB[,] result = new myRGB[convertedBitmpImage.PixelHeight, (int)convertedBitmpImage.Width];
+            for (int i = 0; i < myRGBs.GetLength(0); ++i)
+            {
+                for (int j = 0; j < myRGBs.GetLength(1); ++j)
+                {
+                    result[i, j] = new myRGB(0, 0, 0);
+                    double y = (double)myRGBs[i, j].R;
+                    double Cr = (double)myRGBs[i, j].B-128;
+                    double Cb = (double)myRGBs[i, j].G-128;
+                    //result[i, j].R = myRGBs[i, j].R + (Cr + Cr >> 2 + Cr >> 3 + Cr >> 5);
+                    //result[i, j].B = myRGBs[i, j].R - (Cb >> 2 + Cb >> 4 + Cb >> 5) - (Cr >> 1 + Cr >> 3 + Cr >> 4 + Cr >> 5);
+                    //result[i, j].G = myRGBs[i, j].R + (Cb + Cb >> 1 + Cb >> 2 + Cb >> 6);
+                    result[i, j].R = (int)(y + (1.402 * Cr));
+                    result[i, j].G = (int)(y - (0.3441 * Cb) - (0.7141 * Cr));
+                    result[i, j].B = (int)(y + (1.772 * Cb));
+                    result[i, j].R = (int)Math.Min(result[i, j].R, 255);
+                    result[i, j].R = (int)Math.Max(result[i, j].R, 0);
+                    result[i, j].G = (int)Math.Min(result[i, j].G, 255);
+                    result[i, j].G = (int)Math.Max(result[i, j].G, 0);
+                    result[i, j].B = (int)Math.Min(result[i, j].B, 255);
+                    result[i, j].B = (int)Math.Max(result[i, j].B, 0);
+                }
+            }
+            int z = 0;
+            var stride = convertedBitmpImage.Width * Constans.pixel_size;
+            byte[] pixelsv2 = new byte[(int)(stride) * convertedBitmpImage.PixelHeight];
+            for (int i = 0; i < result.GetLength(0); i++)
+            {
+                for (int j = 0; j < result.GetLength(1); j++)
+                {
+                    pixelsv2[z] = (byte)result[i, j].R;
+                    z++;
+                    pixelsv2[z] = (byte)result[i, j].G;
+                    z++;
+                    pixelsv2[z] = (byte)result[i, j].B;
+                    z++;
+                    pixelsv2[z] = (byte)255;
+                    z++;
+                }
+            }
+            var tmp = BitmapSource.Create(convertedBitmpImage.PixelWidth, convertedBitmpImage.PixelHeight, convertedBitmpImage.DpiX,
+                convertedBitmpImage.DpiY, convertedBitmpImage.Format,
+                null, pixelsv2, (int)stride);
+
+            convertedBitmpImage = BitmapSourceToBitmapImage(tmp);
+        }
     }
 
 }
